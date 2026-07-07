@@ -4,6 +4,7 @@ import type { AgentDriver } from "../driver/types";
 import type { RunRepository, Run } from "../store/runs";
 import type { StepRepository } from "../store/steps";
 import type { CheckpointRepository } from "../store/checkpoints";
+import { loadWorkflowFromString } from "../schema/parse";
 
 export interface EngineDeps {
   runs: RunRepository;
@@ -79,4 +80,28 @@ export async function startRun(
     currentStageIndex: 0,
   });
   return executeFrom(deps, run, workflow, 0);
+}
+
+export async function resumeRun(
+  deps: EngineDeps,
+  runId: string,
+  decision: { approve: boolean; note?: string },
+): Promise<Run> {
+  const run = deps.runs.get(runId);
+  if (!run) throw new Error(`找不到 run：${runId}`);
+  if (run.status !== "paused") {
+    throw new Error(`run ${runId} 狀態為 ${run.status}，非 paused，無法核可/駁回`);
+  }
+  const pending = deps.checkpoints.getPendingByRun(runId);
+  if (!pending) throw new Error(`run ${runId} 沒有待決的 checkpoint`);
+
+  if (!decision.approve) {
+    deps.checkpoints.decide(pending.id, "rejected", decision.note);
+    deps.runs.updateStatus(runId, "rejected");
+    return deps.runs.get(runId)!;
+  }
+
+  deps.checkpoints.decide(pending.id, "approved", decision.note);
+  const { workflow } = loadWorkflowFromString(run.workflowSnapshot);
+  return executeFrom(deps, run, workflow, run.currentStageIndex);
 }
