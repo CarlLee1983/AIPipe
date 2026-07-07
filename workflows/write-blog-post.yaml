@@ -1,0 +1,25 @@
+# workflows/write-blog-post.yaml
+name: write-blog-post
+description: 研究主題並產出部落格草稿
+inputs:
+  - name: topic
+    required: true
+stages:
+  - id: research
+    name: 蒐集資料
+    agent:
+      prompt: "研究主題「{{topic}}」，整理三個重點"
+      allowedTools: [WebSearch, Read]
+    output: research_notes
+  - id: draft
+    name: 撰寫草稿
+    agent:
+      prompt: "根據以下筆記寫一篇草稿：\n{{research_notes}}"
+    output: draft
+    checkpoint:
+      prompt: "草稿看起來 OK 嗎？核可後才發佈"
+  - id: publish
+    name: 發佈
+    agent:
+      prompt: "把這篇草稿整理成最終格式：\n{{draft}}"
+    output: final

@@ -1,0 +1,9 @@
+name: demo
+stages:
+  - id: draft
+    agent: { prompt: "寫草稿" }
+    output: draft
+    checkpoint: { prompt: "OK 嗎？" }
+  - id: publish
+    agent: { prompt: "發佈 {{draft}}" }
+    output: final
