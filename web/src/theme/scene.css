@@ -8,6 +8,10 @@
   aspect-ratio: 4 / 3;
   image-rendering: pixelated;
   box-shadow: inset 0 0 0 2px #e6d9b0;
+  /* 角色高度以場景為基準；前中後景差距約 15–25%，避免尺寸斷層 */
+  --char-h-front: 34%;
+  --char-h-mid: 31%;
+  --char-h-back: 27%;
 }
 
 .field {
@@ -54,8 +58,9 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  object-position: bottom center;
   image-rendering: pixelated;
-  filter: drop-shadow(0 8px 4px rgba(0, 0, 0, 0.38));
+  filter: drop-shadow(0 4px 2px rgba(0, 0, 0, 0.32));
 }
 
 .hall-shell {
@@ -78,26 +83,138 @@
   gap: 12px;
 }
 
+@keyframes light-pulse {
+  0%, 100% { opacity: 0.22; }
+  50% { opacity: 0.38; }
+}
+
+@keyframes dust-drift {
+  0% { transform: translate(0, 0); opacity: 0.15; }
+  50% { opacity: 0.45; }
+  100% { transform: translate(12px, -18px); opacity: 0.1; }
+}
+
+.scene-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.scene-counter {
+  position: absolute;
+  left: 24%;
+  right: 24%;
+  bottom: 42%;
+  height: 11%;
+  z-index: 2;
+  background:
+    linear-gradient(180deg, #8a6840 0%, #6a5030 55%, #4a3820 100%);
+  border: 3px solid #2a2010;
+  border-radius: 3px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 220, 160, 0.25),
+    0 4px 8px rgba(0, 0, 0, 0.35);
+}
+
+.scene-banner {
+  position: absolute;
+  top: 12%;
+  width: 8%;
+  height: 22%;
+  background: linear-gradient(180deg, #c84040, #802020);
+  border: 2px solid #401010;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(255, 200, 120, 0.3);
+}
+
+.scene-banner-left { left: 6%; transform: rotate(-4deg); }
+.scene-banner-right { right: 6%; transform: rotate(4deg); }
+
+.scene-light {
+  position: absolute;
+  top: -10%;
+  left: 30%;
+  width: 40%;
+  height: 70%;
+  background: linear-gradient(165deg, rgba(255, 240, 180, 0.35), transparent 70%);
+  transform: skewX(-12deg);
+  animation: light-pulse 6s ease-in-out infinite;
+}
+
+.scene-dust {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255, 248, 210, 0.7);
+  border-radius: 50%;
+  animation: dust-drift 8s ease-in-out infinite;
+}
+
+.scene-dust-1 { left: 20%; top: 45%; animation-delay: 0s; animation-duration: 9s; }
+.scene-dust-2 { left: 55%; top: 30%; animation-delay: 1.5s; animation-duration: 11s; }
+.scene-dust-3 { left: 75%; top: 50%; animation-delay: 3s; animation-duration: 8s; }
+.scene-dust-4 { left: 35%; top: 60%; animation-delay: 2s; animation-duration: 10s; }
+.scene-dust-5 { left: 65%; top: 40%; animation-delay: 4s; animation-duration: 12s; }
+
+.scene-characters {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.ambient-adventurer {
+  position: absolute;
+  z-index: 1;
+  height: var(--char-h-back);
+  aspect-ratio: 2 / 3;
+  width: auto;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.28));
+  opacity: 0.92;
+}
+
+.ambient-a { left: 5%; bottom: 26%; }
+.ambient-b { right: 6%; bottom: 28%; }
+.ambient-c { left: 16%; bottom: 22%; }
+
+.sprite-body {
+  width: 100%;
+  height: 100%;
+}
+
+.sprite-svg-wrap {
+  width: 100%;
+  height: 100%;
+}
+
+.sprite-svg {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
 .sprite {
   position: absolute;
-  z-index: 2;
   pointer-events: none;
+  width: auto;
 }
 
 .sprite-npc {
-  width: clamp(124px, 14vw, 184px);
-  height: clamp(230px, 28vw, 350px);
-  left: 50%;
-  bottom: 18%;
-  transform: translateX(-74%);
+  height: var(--char-h-mid);
+  aspect-ratio: 588 / 1245;
+  left: 36%;
+  bottom: 32%;
+  transform: translateX(-50%);
+  z-index: 2;
 }
 
 .sprite-player {
-  width: clamp(118px, 13vw, 176px);
-  height: clamp(238px, 29vw, 365px);
-  left: 50%;
-  bottom: 6%;
-  transform: translateX(30%);
+  height: var(--char-h-front);
+  aspect-ratio: 614 / 1449;
+  left: 62%;
+  bottom: 14%;
+  transform: translateX(-50%);
+  z-index: 3;
 }
 
 @media (max-width: 980px) {
@@ -118,17 +235,8 @@
 
   .cabinet {
     min-height: 360px;
-  }
-
-  .sprite-npc {
-    width: 104px;
-    height: 198px;
-    bottom: 17%;
-  }
-
-  .sprite-player {
-    width: 100px;
-    height: 210px;
-    bottom: 5%;
+    --char-h-front: 32%;
+    --char-h-mid: 29%;
+    --char-h-back: 25%;
   }
 }

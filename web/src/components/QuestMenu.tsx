@@ -17,6 +17,22 @@ export function statusLabel(status: RunStatus): string {
   }
 }
 
+export function statusClass(status: RunStatus): string {
+  switch (status) {
+    case "running":
+      return "quest-status-running";
+    case "paused":
+      return "quest-status-paused";
+    case "completed":
+      return "quest-status-completed";
+    case "rejected":
+    case "failed":
+      return "quest-status-failed";
+    default:
+      return "quest-status-pending";
+  }
+}
+
 export function QuestMenu({ runs, selectedId, onSelect }: {
   runs: Run[];
   selectedId: string | null;
@@ -37,7 +53,7 @@ export function QuestMenu({ runs, selectedId, onSelect }: {
             ▶
           </span>
           {run.workflowName}
-          <span className="quest-status">{statusLabel(run.status)}</span>
+          <span className={`quest-status ${statusClass(run.status)}`}>{statusLabel(run.status)}</span>
         </button>
       ))}
     </div>
