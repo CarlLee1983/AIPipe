@@ -4,28 +4,12 @@ import type { Run, WorkflowSummary } from "../api/types";
 import { useRun } from "../hooks/useRun";
 import { useRunEvents } from "../hooks/useRunEvents";
 import { useSfx } from "../hooks/useSfx";
-import { CheckpointPrompt } from "./CheckpointPrompt";
-import { DialogBox } from "./DialogBox";
 import { HudBar } from "./HudBar";
 import { NewQuestForm } from "./NewQuestForm";
-import { QuestLog } from "./QuestLog";
 import { QuestMenu } from "./QuestMenu";
+import { QuestDetailScreen } from "./QuestDetailScreen";
 import { Scene } from "./Scene";
 import { Sprite } from "./Sprite";
-
-function dialogText(detail: NonNullable<ReturnType<typeof useRun>["detail"]>): string {
-  const lastStep = detail.steps[detail.steps.length - 1];
-  switch (detail.run.status) {
-    case "completed":
-      return "任務完成，做得好，勇者！";
-    case "failed":
-      return "唔……勇者倒下了，這趟任務失敗了。";
-    case "rejected":
-      return "這份委託被退回了。";
-    default:
-      return lastStep ? `勇者正在進行：${lastStep.stageId}……` : "勇者整裝待發。";
-  }
-}
 
 export function Hall() {
   const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
@@ -55,8 +39,6 @@ export function Hall() {
     setSelectedId(id);
   }, [play]);
 
-  const pending = detail?.checkpoints.find((checkpoint) => checkpoint.decision === "pending") ?? null;
-
   return (
     <div className="hall-shell">
       <HudBar title="勇者公會大廳" muted={muted} onToggleSfx={toggle} />
@@ -70,20 +52,14 @@ export function Hall() {
           <NewQuestForm workflows={workflows} onCreated={(id) => { setSelectedId(id); loadRuns(); }} />
         </div>
       </div>
-      {selectedId && detail && <QuestLog steps={detail.steps} />}
       {selectedId && detail && (
-        pending ? (
-          <CheckpointPrompt
-            runId={selectedId}
-            checkpoint={pending}
-            onDecided={() => { reload(); loadRuns(); }}
-            onApprove={() => play("sfx-confirm")}
-          />
-        ) : (
-          <DialogBox speaker="公會主" portraitKey="npc-master" typewriter>
-            {dialogText(detail)}
-          </DialogBox>
-        )
+        <QuestDetailScreen
+          runId={selectedId}
+          detail={detail}
+          onBack={() => setSelectedId(null)}
+          onDecided={() => { reload(); loadRuns(); }}
+          onApprove={() => play("sfx-confirm")}
+        />
       )}
     </div>
   );
