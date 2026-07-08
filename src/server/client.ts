@@ -2,6 +2,9 @@ import type { ServerEvent } from "./events/bus";
 import type { Run } from "../schema/run";
 import type { StepRecord } from "../store/steps";
 import type { CheckpointRecord } from "../store/checkpoints";
+import type { WorkflowSummary } from "./workflows";
+
+export type { WorkflowSummary };
 
 export interface RunDetail {
   run: Run;
@@ -15,6 +18,7 @@ export interface ApiClient {
   getRun(runId: string): Promise<RunDetail>;
   resumeRun(runId: string, approve: boolean, note?: string): Promise<{ runId: string; status: string }>;
   subscribeEvents(runId: string, onEvent: (event: ServerEvent) => void, onError?: (err: Error) => void): () => void;
+  listWorkflows(): Promise<WorkflowSummary[]>;
 }
 
 export function createClient(baseUrl: string): ApiClient {
@@ -104,6 +108,11 @@ export function createClient(baseUrl: string): ApiClient {
 
       start();
       return () => controller.abort();
+    },
+
+    async listWorkflows() {
+      const res = await fetch(url("/api/workflows"));
+      return handleRes(res);
     },
   };
 }

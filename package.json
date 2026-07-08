@@ -6,7 +6,8 @@
   "bin": { "aipipe": "src/cli/index.ts" },
   "scripts": {
     "test": "bun test",
-    "cli": "bun run src/cli/index.ts"
+    "cli": "bun run src/cli/index.ts",
+    "server": "bun run src/server/index.ts"
   },
   "dependencies": {
     "yaml": "^2.5.0",

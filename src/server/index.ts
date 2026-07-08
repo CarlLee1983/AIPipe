@@ -1,9 +1,10 @@
 import { serve, type Server } from "bun";
+import { join } from "node:path";
 import { openDb } from "../store/db";
 import { RunRepository } from "../store/runs";
 import { StepRepository } from "../store/steps";
 import { CheckpointRepository } from "../store/checkpoints";
-import { createDriver, type Driver } from "../driver";
+import { createDriver, MockDriver, type Driver } from "../driver";
 import { EventBus } from "./events/bus";
 import { WorkflowCatalog } from "./workflows";
 import { createRunHandler, resumeRunHandler, getRunHandler, listRunsHandler } from "./routes/runs";
@@ -14,6 +15,7 @@ export interface ServerOptions {
   port?: number;
   dbPath?: string;
   workflowsDir?: string;
+  staticDir?: string;
   driver?: Driver;
 }
 
@@ -58,20 +60,41 @@ export function startServer(options: ServerOptions = {}) {
         if (req.method === "GET" && path === "/api/runs") {
           return withCors(await listRunsHandler(req, deps));
         }
+        if (req.method === "GET" && path === "/api/workflows") {
+          const workflows = await catalog.list();
+          return withCors(
+            new Response(JSON.stringify(workflows), {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            }),
+          );
+        }
 
         const runMatch = path.match(/^\/api\/runs\/([^\/]+)$/);
         if (req.method === "GET" && runMatch) {
-          return withCors(await getRunHandler(req, deps, runMatch[1]));
+          return withCors(await getRunHandler(req, deps, decodeURIComponent(runMatch[1])));
         }
 
         const resumeMatch = path.match(/^\/api\/runs\/([^\/]+)\/resume$/);
         if (req.method === "POST" && resumeMatch) {
-          return withCors(await resumeRunHandler(req, deps, catalog, bus, resumeMatch[1]));
+          return withCors(await resumeRunHandler(req, deps, catalog, bus, decodeURIComponent(resumeMatch[1])));
         }
 
         const eventsMatch = path.match(/^\/api\/runs\/([^\/]+)\/events$/);
         if (req.method === "GET" && eventsMatch) {
-          return withCors(sseHandler(req, bus, deps, eventsMatch[1]));
+          return withCors(sseHandler(req, bus, deps, decodeURIComponent(eventsMatch[1])));
+        }
+
+        if (req.method === "GET" && !path.startsWith("/api") && options.staticDir) {
+          const filePath = join(options.staticDir, path === "/" ? "index.html" : path);
+          const file = Bun.file(filePath);
+          if (await file.exists()) {
+            return new Response(file);
+          }
+          const indexFile = Bun.file(join(options.staticDir, "index.html"));
+          if (await indexFile.exists()) {
+            return new Response(indexFile);
+          }
         }
 
         return withCors(
@@ -98,4 +121,25 @@ export function startServer(options: ServerOptions = {}) {
     catalog,
     bus,
   };
+}
+
+export function main() {
+  const port = process.env.AIPIPE_PORT ? parseInt(process.env.AIPIPE_PORT, 10) : 3000;
+  const dbPath = process.env.AIPIPE_DB ?? "aipipe.db";
+  const workflowsDir = process.env.AIPIPE_WORKFLOWS ?? "workflows";
+  const staticDir = process.env.AIPIPE_STATIC;
+  const driver = process.env.AIPIPE_MOCK === "1" ? new MockDriver([]) : createDriver();
+
+  const { server } = startServer({
+    port,
+    dbPath,
+    workflowsDir,
+    staticDir,
+    driver,
+  });
+  console.log(`[AIPipe Server] running on http://localhost:${server.port}`);
+}
+
+if (import.meta.main) {
+  main();
 }
