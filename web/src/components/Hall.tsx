@@ -7,6 +7,7 @@ import { CheckpointPrompt } from "./CheckpointPrompt";
 import { DialogBox } from "./DialogBox";
 import { HudBar } from "./HudBar";
 import { NewQuestForm } from "./NewQuestForm";
+import { QuestLog } from "./QuestLog";
 import { QuestMenu } from "./QuestMenu";
 import { Scene } from "./Scene";
 import { Sprite } from "./Sprite";
@@ -48,6 +49,7 @@ export function Hall() {
           <NewQuestForm workflows={workflows} onCreated={(id) => { setSelectedId(id); loadRuns(); }} />
         </div>
       </div>
+      {selectedId && detail && <QuestLog steps={detail.steps} />}
       {selectedId && detail && (
         pending ? (
           <CheckpointPrompt runId={selectedId} checkpoint={pending} onDecided={() => { reload(); loadRuns(); }} />
