@@ -80,7 +80,7 @@ export function Hall() {
             onApprove={() => play("sfx-confirm")}
           />
         ) : (
-          <DialogBox speaker="公會主" portraitKey="portrait-master" typewriter>
+          <DialogBox speaker="公會主" portraitKey="npc-master" typewriter>
             {dialogText(detail)}
           </DialogBox>
         )

@@ -5,7 +5,7 @@ import { DialogBox } from "../../src/components/DialogBox";
 
 test("DialogBox 顯示說話者、頭像與內容", () => {
   const view = render(
-    <DialogBox speaker="公會主" portraitKey="portrait-master">
+    <DialogBox speaker="公會主" portraitKey="npc-master">
       是否核可發佈？
     </DialogBox>,
   );
@@ -17,7 +17,7 @@ test("DialogBox 顯示說話者、頭像與內容", () => {
 
 test("DialogBox typewriter 初始不顯示全文", () => {
   const view = render(
-    <DialogBox speaker="公會主" portraitKey="portrait-master" typewriter>
+    <DialogBox speaker="公會主" portraitKey="npc-master" typewriter>
       你好勇者
     </DialogBox>,
   );

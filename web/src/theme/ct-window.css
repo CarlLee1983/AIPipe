@@ -115,9 +115,10 @@
 }
 
 .dialog-portrait {
-  flex: 0 0 48px;
-  width: 48px;
-  height: 48px;
+  flex: 0 0 76px;
+  width: 76px;
+  height: 76px;
+  position: relative;
   border: 2px solid var(--ct-frame);
   border-radius: 4px;
   overflow: hidden;
@@ -135,6 +136,17 @@
 .dialog-portrait-img {
   image-rendering: pixelated;
   object-fit: cover;
+  object-position: center top;
+}
+
+/* 全身角色像裁切成頭像：以百分比定位框（相對正方形頭像框） */
+.dialog-portrait-img--crop {
+  position: absolute;
+  width: var(--portrait-w);
+  height: auto;
+  left: var(--portrait-x);
+  top: var(--portrait-y);
+  object-fit: unset;
 }
 
 .dialog-portrait-fallback {

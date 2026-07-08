@@ -29,7 +29,7 @@ export function CheckpointPrompt({ runId, checkpoint, onDecided, onApprove }: {
   };
 
   return (
-    <DialogBox speaker="公會主" portraitKey="portrait-master">
+    <DialogBox speaker="公會主" portraitKey="npc-master">
       {checkpoint.prompt}
       <div style={{ marginTop: 8 }}>
         <button

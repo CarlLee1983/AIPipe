@@ -11,25 +11,19 @@ test("主要場景素材已接入", () => {
   expect(hasAsset("player")).toBe(true);
 });
 
-test("角色與對話像素素材已接入", () => {
+test("路人像素素材已接入", () => {
   expect(assetPath("adventurer")).toBe("/assets/adventurer.png");
-  expect(assetPath("portrait-master")).toBe("/assets/portrait-master.png");
-  expect(assetPath("portrait-hero")).toBe("/assets/portrait-hero.png");
   expect(hasAsset("adventurer")).toBe(true);
-  expect(hasAsset("portrait-master")).toBe(true);
-  expect(hasAsset("portrait-hero")).toBe(true);
 });
 
 test("SVG fallback 仍可用於缺圖素材", () => {
   expect(hasSvgFallback("adventurer")).toBe(true);
-  expect(hasSvgFallback("portrait-master")).toBe(true);
   expect(hasAsset("sfx-cursor")).toBe(false);
 });
 
 test("所有 key 都可查詢不擲錯", () => {
   for (const key of [
     "scene-bg", "npc-master", "player", "adventurer",
-    "portrait-master", "portrait-hero",
     "sfx-cursor", "sfx-confirm", "sfx-complete",
   ] as const) {
     expect(() => hasAsset(key)).not.toThrow();
