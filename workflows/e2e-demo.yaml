@@ -1,0 +1,18 @@
+name: e2e-demo
+description: E2E 用最短含檢查點流程
+inputs:
+  - name: topic
+    required: true
+stages:
+  - id: research
+    name: 蒐集資料
+    agent:
+      prompt: "研究 {{topic}}"
+    output: notes
+    checkpoint:
+      prompt: "資料看起來 OK 嗎？"
+  - id: finalize
+    name: 收尾
+    agent:
+      prompt: "整理 {{notes}}"
+    output: final

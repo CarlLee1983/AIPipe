@@ -351,7 +351,9 @@ export function RunView({ client, runId }: RunViewProps) {
             prompt: currentCheckpoint.prompt,
           }}
           onResolved={() => {
-            setStatus("running");
+            setStatus((prev) =>
+              prev === "completed" || prev === "failed" || prev === "rejected" ? prev : "running"
+            );
             setCurrentCheckpoint(null);
           }}
         />

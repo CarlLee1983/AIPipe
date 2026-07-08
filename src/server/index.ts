@@ -128,7 +128,9 @@ export function main() {
   const dbPath = process.env.AIPIPE_DB ?? "aipipe.db";
   const workflowsDir = process.env.AIPIPE_WORKFLOWS ?? "workflows";
   const staticDir = process.env.AIPIPE_STATIC;
-  const driver = process.env.AIPIPE_MOCK === "1" ? new MockDriver([]) : createDriver();
+  const driver = process.env.AIPIPE_MOCK === "1"
+    ? new MockDriver((input) => ({ output: `（模擬輸出）${input.prompt}` }))
+    : createDriver();
 
   const { server } = startServer({
     port,
