@@ -79,14 +79,14 @@ export async function executeFrom(
   return deps.runs.get(run.id)!;
 }
 
-export async function startRun(
+export function createRun(
   deps: EngineDeps,
   workflow: Workflow,
   inputs: Record<string, string>,
   source: string,
-): Promise<Run> {
+): Run {
   const context = resolveInputs(workflow, inputs); // 缺 required 在此擲錯
-  const run = deps.runs.create({
+  return deps.runs.create({
     workflowName: workflow.name,
     workflowSnapshot: source,
     inputs: context,
@@ -94,8 +94,49 @@ export async function startRun(
     status: "pending",
     currentStageIndex: 0,
   });
+}
+
+export async function startRun(
+  deps: EngineDeps,
+  workflow: Workflow,
+  inputs: Record<string, string>,
+  source: string,
+): Promise<Run> {
+  const run = createRun(deps, workflow, inputs, source);
   return executeFrom(deps, run, workflow, 0);
 }
+
+export interface ResumePrep {
+  run: Run;
+  resume: boolean;
+  workflow?: Workflow;
+  fromIndex?: number;
+}
+
+export function prepareResume(
+  deps: EngineDeps,
+  runId: string,
+  decision: { approve: boolean; note?: string },
+): ResumePrep {
+  const run = deps.runs.get(runId);
+  if (!run) throw new Error(`找不到 run：${runId}`);
+  if (run.status !== "paused") {
+    throw new Error(`run ${runId} 狀態為 ${run.status}，非 paused，無法核可/駁回`);
+  }
+  const pending = deps.checkpoints.getPendingByRun(runId);
+  if (!pending) throw new Error(`run ${runId} 沒有待決的 checkpoint`);
+
+  if (!decision.approve) {
+    deps.checkpoints.decide(pending.id, "rejected", decision.note);
+    deps.runs.updateStatus(runId, "rejected");
+    return { run: deps.runs.get(runId)!, resume: false };
+  }
+
+  deps.checkpoints.decide(pending.id, "approved", decision.note);
+  const { workflow } = loadWorkflowFromString(run.workflowSnapshot);
+  return { run, resume: true, workflow, fromIndex: run.currentStageIndex };
+}
+
 
 export async function resumeRun(
   deps: EngineDeps,
