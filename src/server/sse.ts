@@ -1,6 +1,10 @@
 import type { EngineDeps } from "../engine/runner";
 import type { EventBus, ServerEvent } from "./events/bus";
 
+export function formatSseFrame(event: ServerEvent): string {
+  return `data: ${JSON.stringify(event)}\n\n`;
+}
+
 export function sseHandler(
   req: Request,
   bus: EventBus,
@@ -22,7 +26,7 @@ export function sseHandler(
     start(controller) {
       const send = (event: ServerEvent) => {
         try {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+          controller.enqueue(encoder.encode(formatSseFrame(event)));
         } catch {
           // 連線關閉時忽略寫入錯誤
         }
@@ -31,7 +35,7 @@ export function sseHandler(
       const sendBatch = (events: ServerEvent[]) => {
         if (events.length === 0) return;
         try {
-          const payload = events.map((e) => `data: ${JSON.stringify(e)}\n\n`).join("");
+          const payload = events.map((e) => formatSseFrame(e)).join("");
           controller.enqueue(encoder.encode(payload));
         } catch {
           // 連線關閉時忽略寫入錯誤
@@ -42,46 +46,46 @@ export function sseHandler(
       const historyEvents: ServerEvent[] = [];
       historyEvents.push({
         type: "run:created",
-        timestamp: run.createdAt,
+        timestamp: Date.parse(run.createdAt),
         data: { runId: run.id, workflowName: run.workflowName },
       });
 
       const steps = deps.steps.listByRun(runId);
-      for (const step of steps) {
+      steps.forEach((step, idx) => {
         historyEvents.push({
           type: "stage:start",
-          timestamp: step.startedAt,
-          data: { runId: run.id, stageId: step.stageId, index: 0, prompt: step.prompt },
+          timestamp: Date.parse(step.startedAt),
+          data: { runId: run.id, stageId: step.stageId, index: idx, prompt: step.prompt },
         });
 
-        if (step.status === "completed" && step.output !== undefined && step.completedAt !== undefined) {
+        if (step.status === "completed" && step.output !== null && step.endedAt !== null) {
           historyEvents.push({
             type: "stage:done",
-            timestamp: step.completedAt,
+            timestamp: Date.parse(step.endedAt),
             data: { runId: run.id, stageId: step.stageId, output: step.output },
           });
-        } else if (step.status === "failed" && step.error !== undefined && step.completedAt !== undefined) {
+        } else if (step.status === "failed" && step.error !== null && step.endedAt !== null) {
           historyEvents.push({
             type: "run:failed",
-            timestamp: step.completedAt,
+            timestamp: Date.parse(step.endedAt),
             data: { runId: run.id, stageId: step.stageId, error: step.error },
           });
         }
-      }
+      });
 
       if (run.status === "paused") {
         const cp = deps.checkpoints.getLatestByRun(runId);
         if (cp) {
           historyEvents.push({
             type: "run:checkpoint",
-            timestamp: cp.createdAt,
+            timestamp: Date.parse(run.updatedAt),
             data: { runId: run.id, stageId: cp.stageId, prompt: cp.prompt, checkpointId: cp.id },
           });
         }
       } else if (run.status === "completed") {
         historyEvents.push({
           type: "run:completed",
-          timestamp: run.updatedAt,
+          timestamp: Date.parse(run.updatedAt),
           data: { runId: run.id },
         });
       } else if (run.status === "failed") {
@@ -89,7 +93,7 @@ export function sseHandler(
         if (!hasFailedStep) {
           historyEvents.push({
             type: "run:failed",
-            timestamp: run.updatedAt,
+            timestamp: Date.parse(run.updatedAt),
             data: { runId: run.id, stageId: "root", error: "Run failed without step error" },
           });
         }

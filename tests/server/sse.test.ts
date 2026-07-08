@@ -59,3 +59,39 @@ test("sseHandler 回傳 SSE headers 且連線後送出舊事件與新事件", as
 
   await reader.cancel();
 });
+
+test("sseHandler 補發歷史事件 (stage:done 與 run:checkpoint) 且 timestamp 為數字", async () => {
+  const { deps, bus } = setup();
+  const run = deps.runs.create({ workflowName: "demo", workflowSnapshot: "x", inputs: {}, context: {} });
+  const step = deps.steps.create({ runId: run.id, stageId: "s1", prompt: "p" });
+  deps.steps.complete(step.id, "output_result");
+  deps.runs.updateStatus(run.id, "paused");
+  deps.checkpoints.create({ runId: run.id, stageId: "s2", prompt: "approve?" });
+
+  const res = sseHandler(new Request(`http://localhost/api/runs/${run.id}/events`), bus, deps, run.id);
+  expect(res.status).toBe(200);
+
+  const reader = res.body!.getReader();
+  const decoder = new TextDecoder();
+
+  const { value } = await reader.read();
+  const text = decoder.decode(value);
+  expect(text).toContain("run:created");
+  expect(text).toContain("stage:start");
+  expect(text).toContain("stage:done");
+  expect(text).toContain("output_result");
+  expect(text).toContain("run:checkpoint");
+  expect(text).toContain("approve?");
+
+  // 驗證 timestamp 是數字而非字串
+  const lines = text.split("\n\n").filter(Boolean);
+  for (const line of lines) {
+    if (line.startsWith("data: ")) {
+      const parsed = JSON.parse(line.slice(6));
+      expect(typeof parsed.timestamp).toBe("number");
+      expect(Number.isNaN(parsed.timestamp)).toBe(false);
+    }
+  }
+
+  await reader.cancel();
+});
