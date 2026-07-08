@@ -4,6 +4,7 @@ test("發任務、命中檢查點、核可後完成", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByText("勇者公會大廳")).toBeVisible();
 
+  await page.getByRole("button", { name: "發任務" }).click();
   await page.getByRole("combobox").selectOption("e2e-demo");
   await page.getByLabel("topic").fill("Bun 入門");
   await page.getByRole("button", { name: "發佈任務" }).click();
