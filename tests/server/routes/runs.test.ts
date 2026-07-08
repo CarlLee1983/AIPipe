@@ -99,6 +99,7 @@ test("POST resumeRunHandler 在 paused 狀態 approve 回 200；非 paused 回 4
   expect(data.status).toBe("running");
 
   // 已不是 paused 狀態再次 resume 回 409
-  const again = await resumeRunHandler(resumeReq, deps, catalog, bus, runId);
+  const resumeReq2 = jsonReq("POST", `http://localhost/api/runs/${runId}/resume`, { approve: true });
+  const again = await resumeRunHandler(resumeReq2, deps, catalog, bus, runId);
   expect(again.status).toBe(409);
 });

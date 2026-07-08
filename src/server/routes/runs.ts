@@ -12,16 +12,6 @@ function json(data: unknown, status: number = 200): Response {
   });
 }
 
-async function getJson(req: Request): Promise<unknown> {
-  const anyReq = req as any;
-  if (anyReq._cachedBody !== undefined) {
-    return anyReq._cachedBody;
-  }
-  const body = await req.json();
-  anyReq._cachedBody = body;
-  return body;
-}
-
 export async function createRunHandler(
   req: Request,
   deps: EngineDeps,
@@ -30,7 +20,7 @@ export async function createRunHandler(
 ): Promise<Response> {
   let body: unknown;
   try {
-    body = await getJson(req);
+    body = await req.json();
   } catch {
     return json({ error: "Invalid JSON body" }, 400);
   }
@@ -73,7 +63,7 @@ export async function resumeRunHandler(
 ): Promise<Response> {
   let body: unknown;
   try {
-    body = await getJson(req);
+    body = await req.json();
   } catch {
     return json({ error: "Invalid JSON body" }, 400);
   }
