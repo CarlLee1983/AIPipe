@@ -54,3 +54,23 @@ export class WorkflowCatalog {
     return all.find((w) => w.name === name) ?? null;
   }
 }
+
+export async function listWorkflows(dir: string): Promise<Array<{
+  name: string;
+  description?: string;
+  inputs: { name: string; required: boolean; default?: string }[];
+  file: string;
+}>> {
+  const catalog = new WorkflowCatalog(dir);
+  const summaries = await catalog.list();
+  return summaries.map((summary) => ({
+    name: summary.name,
+    description: summary.description,
+    inputs: summary.inputs.map((input) => ({
+      name: input.name,
+      required: input.required,
+      default: input.default,
+    })),
+    file: summary.sourcePath ? summary.sourcePath.split("/").at(-1)! : `${summary.name}.yaml`,
+  }));
+}

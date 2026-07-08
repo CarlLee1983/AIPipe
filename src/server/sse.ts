@@ -1,5 +1,76 @@
 import type { EngineDeps } from "../engine/runner";
-import type { EventBus, ServerEvent } from "./events/bus";
+import type { EventBus, RunEvent, ServerEvent } from "./events/bus";
+
+const TERMINAL_EVENTS = new Set(["run:done", "run:failed", "run:rejected", "run:completed"]);
+
+export function formatSse(event: RunEvent): string {
+  return `event: ${event.type}\ndata: ${JSON.stringify(event.data)}\n\n`;
+}
+
+export function sseResponse(
+  deps: EngineDeps,
+  bus: EventBus,
+  runId: string,
+  opts: { heartbeatMs?: number } = {},
+): Response {
+  const heartbeatMs = opts.heartbeatMs ?? 15_000;
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      let closed = false;
+      let timer: ReturnType<typeof setInterval>;
+      let off: (() => void) | undefined;
+
+      const send = (event: RunEvent) => {
+        if (closed) return;
+        try {
+          controller.enqueue(encoder.encode(formatSse(event)));
+        } catch {
+          // 連線關閉時忽略寫入錯誤
+        }
+      };
+
+      const close = () => {
+        if (closed) return;
+        closed = true;
+        clearInterval(timer);
+        off?.();
+        try {
+          controller.close();
+        } catch {
+          // 忽略已關閉
+        }
+      };
+
+      off = bus.subscribe(runId, (event) => {
+        send(event);
+        if (TERMINAL_EVENTS.has(event.type)) close();
+      });
+
+      const run = deps.runs.get(runId);
+      send({
+        type: "snapshot",
+        data: run
+          ? { run, steps: deps.steps.listByRun(runId), checkpoints: deps.checkpoints.listByRun(runId) }
+          : { run: null },
+      });
+
+      timer = setInterval(() => send({ type: "ping", data: {} }), heartbeatMs);
+    },
+    cancel() {
+      // cleanup is handled by close/off when terminal events arrive; cancel may run after controller close.
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  });
+}
 
 export function formatSseFrame(event: ServerEvent): string {
   return `data: ${JSON.stringify(event)}\n\n`;

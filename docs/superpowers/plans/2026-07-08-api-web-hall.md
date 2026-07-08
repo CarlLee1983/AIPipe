@@ -62,7 +62,7 @@
   - `RunObserver`（optional callbacks）：`onStageStart(e:{stageId:string;name?:string;index:number;prompt:string})`、`onStageDone(e:{stageId:string;output:string})`、`onCheckpoint(e:{stageId:string;prompt:string;checkpointId:string})`、`onRunDone(e:{status:"completed"})`、`onRunFailed(e:{stageId:string;error:string})`
   - `EngineDeps.observer?: RunObserver`
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 Create `tests/engine/runner.observer.test.ts`:
 
@@ -136,12 +136,12 @@ test("不傳 observer 行為不變（一路跑完）", async () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試確認失敗**
+- [x] **Step 2: 執行測試確認失敗**
 
 Run: `bun test tests/engine/runner.observer.test.ts`
 Expected: FAIL —「Export named 'RunObserver' not found」或事件陣列不符。
 
-- [ ] **Step 3: 實作 observer**
+- [x] **Step 3: 實作 observer**
 
 在 `src/engine/runner.ts`，於 `EngineDeps` 之前加型別，並在 `EngineDeps` 加 `observer` 欄位：
 
@@ -209,17 +209,17 @@ export interface RunObserver {
 
 （註：`checkpoints.create` 已回傳含 `id` 的 `CheckpointRecord`，改用回傳值取 `cp.id`。）
 
-- [ ] **Step 4: 執行測試確認通過**
+- [x] **Step 4: 執行測試確認通過**
 
 Run: `bun test tests/engine/runner.observer.test.ts`
 Expected: PASS（3 個測試）。
 
-- [ ] **Step 5: 回歸既有引擎測試**
+- [x] **Step 5: 回歸既有引擎測試**
 
 Run: `bun test tests/engine`
 Expected: 全數 PASS（既有 start/resume/context 測試不受影響）。
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/engine/runner.ts tests/engine/runner.observer.test.ts
@@ -241,7 +241,7 @@ git commit -m "feat: [engine] add optional RunObserver hook"
   - `ResumePrep`：`{ run: Run; resume: boolean; workflow?: Workflow; fromIndex?: number }`
   - `prepareResume(deps: EngineDeps, runId: string, decision: { approve: boolean; note?: string }): ResumePrep` — 同步驗證 + 記錄決策；approve 回 `resume:true` 帶 workflow/fromIndex；reject 標 `rejected` 回 `resume:false`。找不到 run / 非 paused / 無待決 checkpoint 擲帶明確訊息的錯誤。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 Create `tests/engine/runner.nonblocking.test.ts`:
 
@@ -328,12 +328,12 @@ test("prepareResume 非 paused 擲錯", () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試確認失敗**
+- [x] **Step 2: 執行測試確認失敗**
 
 Run: `bun test tests/engine/runner.nonblocking.test.ts`
 Expected: FAIL —「Export named 'createRun' not found」。
 
-- [ ] **Step 3: 實作 createRun 與 prepareResume**
+- [x] **Step 3: 實作 createRun 與 prepareResume**
 
 在 `src/engine/runner.ts`，把 `startRun` 改為重用 `createRun`，並新增 `prepareResume`：
 
@@ -399,17 +399,17 @@ export function prepareResume(
 
 保留既有 `resumeRun`（CLI 用，行為不變）。
 
-- [ ] **Step 4: 執行測試確認通過**
+- [x] **Step 4: 執行測試確認通過**
 
 Run: `bun test tests/engine/runner.nonblocking.test.ts`
 Expected: PASS（6 個測試）。
 
-- [ ] **Step 5: 回歸全部引擎與 CLI 測試**
+- [x] **Step 5: 回歸全部引擎與 CLI 測試**
 
 Run: `bun test tests/engine tests/cli`
 Expected: 全數 PASS。
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/engine/runner.ts tests/engine/runner.nonblocking.test.ts
@@ -429,7 +429,7 @@ git commit -m "feat: [engine] split createRun/prepareResume for non-blocking API
   - `RunEvent`：`{ type: string; data: unknown }`
   - `EventBus` class：`subscribe(runId: string, listener: (e: RunEvent) => void): () => void`（回傳退訂函式）、`publish(runId: string, event: RunEvent): void`、`hasSubscribers(runId: string): boolean`
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 Create `tests/server/bus.test.ts`:
 
@@ -474,12 +474,12 @@ test("一個 listener 擲錯不影響其他 listener", () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試確認失敗**
+- [x] **Step 2: 執行測試確認失敗**
 
 Run: `bun test tests/server/bus.test.ts`
 Expected: FAIL —「Cannot find module '../../src/server/events/bus'」。
 
-- [ ] **Step 3: 實作 EventBus**
+- [x] **Step 3: 實作 EventBus**
 
 Create `src/server/events/bus.ts`:
 
@@ -527,12 +527,12 @@ export class EventBus {
 }
 ```
 
-- [ ] **Step 4: 執行測試確認通過**
+- [x] **Step 4: 執行測試確認通過**
 
 Run: `bun test tests/server/bus.test.ts`
 Expected: PASS（4 個測試）。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/server/events/bus.ts tests/server/bus.test.ts
@@ -553,7 +553,7 @@ git commit -m "feat: [server] add in-process per-run EventBus"
   - `DecisionBody`：`{ note?: string }`；`parseDecisionBody(raw: unknown): DecisionBody`。
   - `ValidationError extends Error`（供 handler 對應 400）。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 Create `tests/server/validation.test.ts`:
 
@@ -586,12 +586,12 @@ test("decision body note 可選", () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試確認失敗**
+- [x] **Step 2: 執行測試確認失敗**
 
 Run: `bun test tests/server/validation.test.ts`
 Expected: FAIL —「Cannot find module '../../src/server/validation'」。
 
-- [ ] **Step 3: 實作驗證**
+- [x] **Step 3: 實作驗證**
 
 Create `src/server/validation.ts`:
 
@@ -630,12 +630,12 @@ export function parseDecisionBody(raw: unknown): DecisionBody {
 }
 ```
 
-- [ ] **Step 4: 執行測試確認通過**
+- [x] **Step 4: 執行測試確認通過**
 
 Run: `bun test tests/server/validation.test.ts`
 Expected: PASS（5 個測試）。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/server/validation.ts tests/server/validation.test.ts
@@ -656,7 +656,7 @@ git commit -m "feat: [server] add zod request body validation"
   - `WorkflowSummary`：`{ name: string; description?: string; inputs: { name: string; required: boolean; default?: string }[]; file: string }`
   - `listWorkflows(dir: string): Promise<WorkflowSummary[]>` — 掃 `dir` 下 `.yaml`/`.yml`，逐檔載入取摘要；載入失敗的檔跳過並 `console.error`，不整批失敗。依 name 排序。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 Create `tests/server/workflows.test.ts`:
 
@@ -696,12 +696,12 @@ test("目錄不存在回空陣列", async () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試確認失敗**
+- [x] **Step 2: 執行測試確認失敗**
 
 Run: `bun test tests/server/workflows.test.ts`
 Expected: FAIL —「Cannot find module」。
 
-- [ ] **Step 3: 實作掃描**
+- [x] **Step 3: 實作掃描**
 
 Create `src/server/workflows.ts`:
 
@@ -745,12 +745,12 @@ export async function listWorkflows(dir: string): Promise<WorkflowSummary[]> {
 }
 ```
 
-- [ ] **Step 4: 執行測試確認通過**
+- [x] **Step 4: 執行測試確認通過**
 
 Run: `bun test tests/server/workflows.test.ts`
 Expected: PASS（3 個測試）。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/server/workflows.ts tests/server/workflows.test.ts
@@ -774,7 +774,7 @@ git commit -m "feat: [server] add workflow directory discovery"
 
 **註（spec 精修）：** 事件集加入 `run:rejected`（`{}`），供 SSE 客戶端得知駁回終態；SSE 於 `run:done`/`run:failed`/`run:rejected` 關閉連線。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 Create `tests/server/background.test.ts`:
 
@@ -854,12 +854,12 @@ test("resumeInBackground reject 發 run:rejected", async () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試確認失敗**
+- [x] **Step 2: 執行測試確認失敗**
 
 Run: `bun test tests/server/background.test.ts`
 Expected: FAIL —「Cannot find module '../../src/server/background'」。
 
-- [ ] **Step 3: 實作背景執行**
+- [x] **Step 3: 實作背景執行**
 
 Create `src/server/background.ts`:
 
@@ -913,12 +913,12 @@ export async function resumeInBackground(
 }
 ```
 
-- [ ] **Step 4: 執行測試確認通過**
+- [x] **Step 4: 執行測試確認通過**
 
 Run: `bun test tests/server/background.test.ts`
 Expected: PASS（3 個測試）。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/server/background.ts tests/server/background.test.ts
@@ -942,7 +942,7 @@ git commit -m "feat: [server] add background run execution bound to EventBus"
   - `getRunHandler(deps: EngineDeps, id: string): ApiResult` — 含 `steps`、`checkpoints`；找不到 → 404。
   - `decisionHandler(deps: EngineDeps, bus: EventBus, id: string, approve: boolean, rawBody: unknown): ApiResult` — `prepareResume` → `resumeInBackground`（不 await）→ 200 run。找不到 → 404；非 paused/無 checkpoint → 409。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 Create `tests/server/handlers.test.ts`:
 
@@ -1041,12 +1041,12 @@ test("decisionHandler 找不到 run 回 404", () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試確認失敗**
+- [x] **Step 2: 執行測試確認失敗**
 
 Run: `bun test tests/server/handlers.test.ts`
 Expected: FAIL —「Cannot find module '../../src/server/handlers'」。
 
-- [ ] **Step 3: 實作 handlers**
+- [x] **Step 3: 實作 handlers**
 
 Create `src/server/handlers.ts`:
 
@@ -1138,12 +1138,12 @@ export function decisionHandler(
 }
 ```
 
-- [ ] **Step 4: 執行測試確認通過**
+- [x] **Step 4: 執行測試確認通過**
 
 Run: `bun test tests/server/handlers.test.ts`
 Expected: PASS（9 個測試）。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/server/handlers.ts tests/server/handlers.test.ts
@@ -1166,7 +1166,7 @@ git commit -m "feat: [server] add pure route handlers"
 
 **測試策略：** `formatSse` 直接單元測試；串流行為用 `ReadableStream` 讀取器 + `bus.publish` 驗證。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 Create `tests/server/sse.test.ts`:
 
@@ -1222,12 +1222,12 @@ test("連線立即送 snapshot，之後推 bus 事件並於終態關閉", async 
 });
 ```
 
-- [ ] **Step 2: 執行測試確認失敗**
+- [x] **Step 2: 執行測試確認失敗**
 
 Run: `bun test tests/server/sse.test.ts`
 Expected: FAIL —「Cannot find module '../../src/server/sse'」。
 
-- [ ] **Step 3: 實作 SSE**
+- [x] **Step 3: 實作 SSE**
 
 Create `src/server/sse.ts`:
 
@@ -1297,12 +1297,12 @@ export function sseResponse(
 }
 ```
 
-- [ ] **Step 4: 執行測試確認通過**
+- [x] **Step 4: 執行測試確認通過**
 
 Run: `bun test tests/server/sse.test.ts`
 Expected: PASS（2 個測試）。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/server/sse.ts tests/server/sse.test.ts
@@ -1324,7 +1324,7 @@ git commit -m "feat: [server] add SSE response generator"
   - `createServer(opts: { deps: EngineDeps; bus: EventBus; workflowsDir: string; staticDir?: string; port: number }): Server` — 回 Bun `Server`。
   - `main(): void` — 讀環境變數組 prod 依賴後 `createServer`；`AIPIPE_MOCK=1` 時用 `MockDriver`（回聲模擬），供 E2E。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 Create `tests/server/integration.test.ts`:
 
@@ -1414,12 +1414,12 @@ test("POST /api/runs 找不到 workflow 回 404", async () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試確認失敗**
+- [x] **Step 2: 執行測試確認失敗**
 
 Run: `bun test tests/server/integration.test.ts`
 Expected: FAIL —「Cannot find module '../../src/server/index'」。
 
-- [ ] **Step 3: 實作伺服器**
+- [x] **Step 3: 實作伺服器**
 
 Create `src/server/index.ts`:
 
@@ -1519,7 +1519,7 @@ export function main(): void {
 if (import.meta.main) main();
 ```
 
-- [ ] **Step 4: 加 package.json script**
+- [x] **Step 4: 加 package.json script**
 
 修改 `package.json` 的 `scripts`，加一行：
 
@@ -1531,17 +1531,17 @@ if (import.meta.main) main();
   },
 ```
 
-- [ ] **Step 5: 執行測試確認通過**
+- [x] **Step 5: 執行測試確認通過**
 
 Run: `bun test tests/server/integration.test.ts`
 Expected: PASS（3 個測試）。
 
-- [ ] **Step 6: 全後端回歸**
+- [x] **Step 6: 全後端回歸**
 
 Run: `bun test`
 Expected: 全數 PASS（含子專案 1 既有測試）。
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/server/index.ts package.json tests/server/integration.test.ts
@@ -1560,7 +1560,7 @@ git commit -m "feat: [server] assemble Bun.serve router with SSE and static serv
 **Interfaces:**
 - Produces: 可 `vite build` 與 `vite dev` 的前端；`App` 元件（暫時只渲染標題）。
 
-- [ ] **Step 1: 安裝前端依賴**
+- [x] **Step 1: 安裝前端依賴**
 
 Run:
 ```bash
@@ -1570,7 +1570,7 @@ cd web && bun add -d vite @vitejs/plugin-react typescript @types/react @types/re
 ```
 Expected: `web/node_modules` 建立，`web/package.json` 有上述依賴。
 
-- [ ] **Step 2: 寫設定與骨架檔**
+- [x] **Step 2: 寫設定與骨架檔**
 
 Create `web/package.json`（覆寫 bun init 產物；保留其加的依賴版本）：
 
@@ -1686,7 +1686,7 @@ export function App() {
 }
 ```
 
-- [ ] **Step 3: 寫 smoke 測試**
+- [x] **Step 3: 寫 smoke 測試**
 
 Create `web/tests/smoke.test.tsx`:
 
@@ -1701,7 +1701,7 @@ test("App 渲染大廳標題", () => {
 });
 ```
 
-- [ ] **Step 4: 執行測試與建置確認通過**
+- [x] **Step 4: 執行測試與建置確認通過**
 
 Run: `cd web && bun test tests/smoke.test.tsx`
 Expected: PASS。
@@ -1709,7 +1709,7 @@ Expected: PASS。
 Run: `cd web && bun run build`
 Expected: 產出 `web/dist/index.html`，無錯誤。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add web/package.json web/bun.lock web/vite.config.ts web/tsconfig.json web/index.html web/bunfig.toml web/test-setup.ts web/.gitignore web/src/main.tsx web/src/App.tsx web/tests/smoke.test.tsx
@@ -1730,7 +1730,7 @@ git commit -m "feat: [web] scaffold React + Vite frontend"
 - Produces（`client.ts`）：`api` 物件：`listWorkflows()`、`listRuns()`、`getRun(id)`、`createRun(workflow, inputs)`、`approve(id, note?)`、`reject(id, note?)`。每個回傳 `data`，失敗擲 `Error(envelope.error)`。
 - Produces（`sse.ts`）：`subscribeRun(id: string, onEvent: (type: string, data: unknown) => void): () => void` — 包 `EventSource`，註冊所有已知事件型別 + `snapshot`/`ping`；回傳關閉函式。
 
-- [ ] **Step 1: 寫失敗測試（client）**
+- [x] **Step 1: 寫失敗測試（client）**
 
 Create `web/tests/api/client.test.ts`:
 
@@ -1763,12 +1763,12 @@ test("getRun 回 RunDetail", async () => {
 });
 ```
 
-- [ ] **Step 2: 執行確認失敗**
+- [x] **Step 2: 執行確認失敗**
 
 Run: `cd web && bun test tests/api/client.test.ts`
 Expected: FAIL —「Cannot find module」。
 
-- [ ] **Step 3: 實作 types 與 client**
+- [x] **Step 3: 實作 types 與 client**
 
 Create `web/src/api/types.ts`:
 
@@ -1829,12 +1829,12 @@ export const api = {
 };
 ```
 
-- [ ] **Step 4: 執行 client 測試確認通過**
+- [x] **Step 4: 執行 client 測試確認通過**
 
 Run: `cd web && bun test tests/api/client.test.ts`
 Expected: PASS（3 個測試）。
 
-- [ ] **Step 5: 寫失敗測試（sse）**
+- [x] **Step 5: 寫失敗測試（sse）**
 
 Create `web/tests/api/sse.test.ts`:
 
@@ -1869,12 +1869,12 @@ test("subscribeRun 註冊所有事件並轉發", () => {
 });
 ```
 
-- [ ] **Step 6: 執行確認失敗**
+- [x] **Step 6: 執行確認失敗**
 
 Run: `cd web && bun test tests/api/sse.test.ts`
 Expected: FAIL —「Cannot find module」。
 
-- [ ] **Step 7: 實作 sse**
+- [x] **Step 7: 實作 sse**
 
 Create `web/src/api/sse.ts`:
 
@@ -1899,12 +1899,12 @@ export function subscribeRun(
 }
 ```
 
-- [ ] **Step 8: 執行 sse 測試確認通過**
+- [x] **Step 8: 執行 sse 測試確認通過**
 
 Run: `cd web && bun test tests/api/sse.test.ts`
 Expected: PASS。
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add web/src/api web/tests/api
@@ -1926,7 +1926,7 @@ git commit -m "feat: [web] add API client and SSE subscription"
   - `hasAsset(key: AssetKey): boolean`
   - 內部 `ASSETS: Record<AssetKey, string | null>`（初期全 `null`，使用者放素材後填路徑，如 `/assets/scene-bg.png`）。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 Create `web/tests/assets/assets.config.test.ts`:
 
@@ -1946,12 +1946,12 @@ test("所有 key 都可查詢不擲錯", () => {
 });
 ```
 
-- [ ] **Step 2: 執行確認失敗**
+- [x] **Step 2: 執行確認失敗**
 
 Run: `cd web && bun test tests/assets/assets.config.test.ts`
 Expected: FAIL —「Cannot find module」。
 
-- [ ] **Step 3: 實作 assets.config 與主題 CSS**
+- [x] **Step 3: 實作 assets.config 與主題 CSS**
 
 Create `web/src/assets/assets.config.ts`:
 
@@ -2045,12 +2045,12 @@ Create `web/src/theme/scene.css`（明亮暖色場景 + 素材插槽 fallback，
 .sprite-img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
 ```
 
-- [ ] **Step 4: 執行測試確認通過**
+- [x] **Step 4: 執行測試確認通過**
 
 Run: `cd web && bun test tests/assets/assets.config.test.ts`
 Expected: PASS（2 個測試）。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add web/src/assets web/src/theme web/tests/assets
@@ -2075,7 +2075,7 @@ git commit -m "feat: [web] add asset config and Chrono Trigger window theme"
   - `DialogBox({ speaker, children })` — CT 藍框對話框。
   - `statusLabel(status: RunStatus): string`（QuestMenu 內部匯出）：`running→執行中`、`paused→待核可`、`completed→完成`、`rejected→駁回`、`failed→失敗`、`pending→準備中`。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 Create `web/tests/components/QuestMenu.test.tsx`:
 
@@ -2117,12 +2117,12 @@ test("DialogBox 顯示說話者與內容", () => {
 });
 ```
 
-- [ ] **Step 2: 執行確認失敗**
+- [x] **Step 2: 執行確認失敗**
 
 Run: `cd web && bun test tests/components/QuestMenu.test.tsx tests/components/DialogBox.test.tsx`
 Expected: FAIL —「Cannot find module」。
 
-- [ ] **Step 3: 實作元件**
+- [x] **Step 3: 實作元件**
 
 Create `web/src/components/Sprite.tsx`:
 
@@ -2224,12 +2224,12 @@ export function DialogBox({ speaker, children }: { speaker?: string; children: R
 }
 ```
 
-- [ ] **Step 4: 執行測試確認通過**
+- [x] **Step 4: 執行測試確認通過**
 
 Run: `cd web && bun test tests/components`
 Expected: PASS（4 個測試）。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add web/src/components/Sprite.tsx web/src/components/Scene.tsx web/src/components/HudBar.tsx web/src/components/QuestMenu.tsx web/src/components/DialogBox.tsx web/tests/components
@@ -2253,7 +2253,7 @@ git commit -m "feat: [web] add presentational hall components"
   - `useRun(id: string | null): { detail: RunDetail | null; reload: () => void }` — 載入 run 細節。
   - `useRunEvents(id, onEvent)` — 在 id 變動時訂閱 SSE，卸載時退訂。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 Create `web/tests/components/CheckpointPrompt.test.tsx`:
 
@@ -2303,12 +2303,12 @@ test("送出表單呼叫 createRun 並回呼 onCreated", async () => {
 });
 ```
 
-- [ ] **Step 2: 執行確認失敗**
+- [x] **Step 2: 執行確認失敗**
 
 Run: `cd web && bun test tests/components/NewQuestForm.test.tsx tests/components/CheckpointPrompt.test.tsx`
 Expected: FAIL —「Cannot find module」。
 
-- [ ] **Step 3: 實作 hooks**
+- [x] **Step 3: 實作 hooks**
 
 Create `web/src/hooks/useRun.ts`:
 
@@ -2345,7 +2345,7 @@ export function useRunEvents(id: string | null, onEvent: (type: string, data: un
 }
 ```
 
-- [ ] **Step 4: 實作互動元件**
+- [x] **Step 4: 實作互動元件**
 
 Create `web/src/components/CheckpointPrompt.tsx`:
 
@@ -2438,12 +2438,12 @@ export function NewQuestForm({ workflows, onCreated }: {
 }
 ```
 
-- [ ] **Step 5: 執行測試確認通過**
+- [x] **Step 5: 執行測試確認通過**
 
 Run: `cd web && bun test tests/components`
 Expected: PASS（含前一 Task 的元件測試，共 6 個）。
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add web/src/components/NewQuestForm.tsx web/src/components/CheckpointPrompt.tsx web/src/hooks web/tests/components/NewQuestForm.test.tsx web/tests/components/CheckpointPrompt.test.tsx
@@ -2463,7 +2463,7 @@ git commit -m "feat: [web] add interactive quest form, checkpoint prompt, and ho
 - Consumes: 全部元件與 hooks、`api`。
 - Produces: `Hall()` — 載入 workflows 與 runs、管理 selectedId、訂閱 SSE 更新選中 run、渲染 HudBar + Scene（NPC/玩家/冒險者 sprite）+ QuestMenu + NewQuestForm + 底部 DialogBox/CheckpointPrompt。`App` 改為渲染 `<Hall/>`。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 Create `web/tests/components/Hall.test.tsx`:
 
@@ -2495,12 +2495,12 @@ test("Hall 載入後顯示任務佈告欄與 NPC 插槽", async () => {
 });
 ```
 
-- [ ] **Step 2: 執行確認失敗**
+- [x] **Step 2: 執行確認失敗**
 
 Run: `cd web && bun test tests/components/Hall.test.tsx`
 Expected: FAIL —「Cannot find module '../../src/components/Hall'」。
 
-- [ ] **Step 3: 實作 Hall 與 App**
+- [x] **Step 3: 實作 Hall 與 App**
 
 Create `web/src/components/Hall.tsx`:
 
@@ -2574,12 +2574,12 @@ export function App() {
 }
 ```
 
-- [ ] **Step 4: 執行測試確認通過**
+- [x] **Step 4: 執行測試確認通過**
 
 Run: `cd web && bun test tests/components/Hall.test.tsx`
 Expected: PASS。
 
-- [ ] **Step 5: 更新 smoke 測試**
+- [x] **Step 5: 更新 smoke 測試**
 
 既有 `web/tests/smoke.test.tsx` 斷言「勇者公會大廳」標題文字仍成立（HudBar title 保留該字串），但改為 mock fetch/EventSource 以免真連線。覆寫 `web/tests/smoke.test.tsx`：
 
@@ -2600,7 +2600,7 @@ test("App 渲染大廳", async () => {
 });
 ```
 
-- [ ] **Step 6: 全前端測試 + 建置**
+- [x] **Step 6: 全前端測試 + 建置**
 
 Run: `cd web && bun test`
 Expected: 全數 PASS。
@@ -2608,7 +2608,7 @@ Expected: 全數 PASS。
 Run: `cd web && bun run build`
 Expected: 產出 `web/dist`，無型別/建置錯誤。
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add web/src/components/Hall.tsx web/src/App.tsx web/tests/components/Hall.test.tsx web/tests/smoke.test.tsx
@@ -2628,7 +2628,7 @@ git commit -m "feat: [web] assemble hall screen wiring components and SSE"
 - Consumes: 已建置前端（`web/dist`）、後端 `createServer`（透過 `AIPIPE_MOCK=1` 用 MockDriver）。
 - Produces: 一條走完「發任務 → 看進度 → 核可 → 完成」的 E2E。
 
-- [ ] **Step 1: 安裝 Playwright**
+- [x] **Step 1: 安裝 Playwright**
 
 Run:
 ```bash
@@ -2637,7 +2637,7 @@ cd web && bunx playwright install chromium
 ```
 Expected: Playwright 與 Chromium 安裝完成。
 
-- [ ] **Step 2: 建 E2E workflow 與設定**
+- [x] **Step 2: 建 E2E workflow 與設定**
 
 Create `workflows/e2e-demo.yaml`:
 
@@ -2682,7 +2682,7 @@ export default defineConfig({
 
 （註：E2E 前需 `bun run build` 產出 `web/dist`，讓後端伺服靜態前端；下方 Step 4 指令包含建置。）
 
-- [ ] **Step 3: 寫 E2E 測試**
+- [x] **Step 3: 寫 E2E 測試**
 
 Create `web/tests/e2e/quest-flow.spec.ts`:
 
@@ -2707,14 +2707,14 @@ test("發任務 → 檢查點 → 核可 → 完成", async ({ page }) => {
 });
 ```
 
-- [ ] **Step 4: 加 script 並執行**
+- [x] **Step 4: 加 script 並執行**
 
 修改 `web/package.json` 的 `scripts` 加：`"e2e": "bun run build && playwright test"`。
 
 Run: `cd web && bun run e2e`
 Expected: 1 passed。（Playwright 會依 config 自動啟動後端；MockDriver 讓流程無需真 `claude`。）
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add web/playwright.config.ts web/tests/e2e/quest-flow.spec.ts web/package.json workflows/e2e-demo.yaml
@@ -2731,7 +2731,7 @@ git commit -m "test: [e2e] add quest lifecycle Playwright test"
 **Interfaces:**
 - Produces: 給使用者外部生成像素素材的清單 + 每項的生成 prompt 與規格，對齊 `assets.config.ts` 的 `AssetKey`。
 
-- [ ] **Step 1: 撰寫素材清單**
+- [x] **Step 1: 撰寫素材清單**
 
 Create `docs/assets/manifest.md`:
 
@@ -2768,7 +2768,7 @@ Create `docs/assets/manifest.md`:
 3. `cd web && bun run dev`，重新整理即可看到素材取代佔位。
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add docs/assets/manifest.md
@@ -2783,7 +2783,7 @@ git commit -m "docs: [assets] add pixel asset manifest with generation prompts"
 - Modify: `.gitignore`（加 `web/node_modules`、`web/dist`、Playwright 產物）
 - Create: `docs/running.md`（如何啟動後端 + 前端的簡短說明）
 
-- [ ] **Step 1: 更新 .gitignore**
+- [x] **Step 1: 更新 .gitignore**
 
 在根 `.gitignore` 追加：
 
@@ -2794,7 +2794,7 @@ web/test-results/
 web/playwright-report/
 ```
 
-- [ ] **Step 2: 寫啟動說明**
+- [x] **Step 2: 寫啟動說明**
 
 Create `docs/running.md`:
 
@@ -2829,12 +2829,12 @@ Create `docs/running.md`:
     cd web && bun run e2e   # Playwright E2E（自動起後端，用 MockDriver）
 ```
 
-- [ ] **Step 3: 全套件回歸**
+- [x] **Step 3: 全套件回歸**
 
 Run: `bun test && cd web && bun test`
 Expected: 後端與前端測試全數 PASS。
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add .gitignore docs/running.md

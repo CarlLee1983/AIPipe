@@ -41,6 +41,9 @@ export function createObserverForBus(
   };
 }
 
+export const makeObserver = (bus: EventBus, runId: string): RunObserver =>
+  createObserverForBus(runId, bus);
+
 export function startInBackground(
   deps: EngineDeps,
   bus: EventBus,

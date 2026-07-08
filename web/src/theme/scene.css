@@ -1,0 +1,55 @@
+.cabinet {
+  font-family: ui-monospace, "Courier New", monospace;
+  border: 4px solid #000;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 4 / 3;
+  image-rendering: pixelated;
+  box-shadow: inset 0 0 0 2px #e6d9b0;
+}
+
+.field {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 46% at 50% 58%, rgba(255, 246, 214, 0.30), rgba(90, 66, 30, 0.20) 70%, rgba(50, 36, 14, 0.42)),
+    radial-gradient(ellipse 11px 8px at 12px 9px, #cdb87f 52%, #a98d55 58%, #7c6436 63%, transparent 66%) 0 0/24px 18px,
+    #5c4a28;
+}
+
+.grove {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 33%;
+  background: #26661f;
+  border-bottom: 3px solid #123f10;
+  box-shadow: inset 0 -5px 6px -2px #123f10;
+}
+
+.slot {
+  border: 2px dashed #2a58c8;
+  border-radius: 5px;
+  color: #0d1c40;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.55), rgba(42, 88, 200, 0.10) 60%, rgba(0, 0, 0, 0.12)),
+    repeating-linear-gradient(45deg, rgba(42, 88, 200, 0.10) 0 6px, transparent 6px 12px);
+  box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 10px;
+  line-height: 1.3;
+  padding: 3px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.sprite-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}

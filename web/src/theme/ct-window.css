@@ -1,0 +1,41 @@
+:root {
+  --ct-edge: #0b1a4a;
+  --ct-frame: #bfe3ff;
+  --ct-mid: #4f86e0;
+  --ct-fill1: #3a63d8;
+  --ct-fill2: #2246ad;
+}
+
+.ct-window {
+  background: linear-gradient(180deg, var(--ct-fill1) 0%, #2f55c4 55%, var(--ct-fill2) 100%);
+  border-radius: 8px;
+  color: #fff;
+  text-shadow: 1px 1px 0 var(--ct-edge);
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.55),
+    inset 0 0 0 2px var(--ct-edge),
+    inset 0 0 0 4px var(--ct-frame),
+    inset 0 0 0 6px var(--ct-mid);
+  padding: 12px 16px;
+  font-family: ui-monospace, "Courier New", monospace;
+}
+
+.ct-window h4 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: #eaf4ff;
+}
+
+.ct-cursor {
+  color: #fff;
+  text-shadow: 0 0 5px var(--ct-frame);
+}
+
+.ct-hl {
+  color: #bff4ff;
+}
+
+.ct-who {
+  color: #ffe27a;
+}
