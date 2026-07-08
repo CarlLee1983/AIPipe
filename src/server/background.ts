@@ -5,7 +5,6 @@ import type { EventBus } from "./events/bus";
 
 export function createObserverForBus(
   runId: string,
-  workflowName: string,
   bus: EventBus,
 ): RunObserver {
   return {
@@ -54,11 +53,12 @@ export function startInBackground(
     data: { runId: run.id, workflowName: workflow.name },
   });
 
-  const observer = createObserverForBus(run.id, workflow.name, bus);
+  const observer = createObserverForBus(run.id, bus);
   const depsWithObserver: EngineDeps = { ...deps, observer };
 
   // 刻意不 await，背景執行
   void executeFrom(depsWithObserver, run, workflow, run.currentStageIndex).catch((err) => {
+    deps.runs.updateStatus(run.id, "failed");
     bus.emit({
       type: "run:failed",
       timestamp: Date.now(),
@@ -85,10 +85,11 @@ export function resumeInBackground(
     return;
   }
 
-  const observer = createObserverForBus(prep.run.id, prep.run.workflowName, bus);
+  const observer = createObserverForBus(prep.run.id, bus);
   const depsWithObserver: EngineDeps = { ...deps, observer };
 
   void executeFrom(depsWithObserver, prep.run, prep.workflow!, prep.fromIndex!).catch((err) => {
+    deps.runs.updateStatus(prep.run.id, "failed");
     bus.emit({
       type: "run:failed",
       timestamp: Date.now(),

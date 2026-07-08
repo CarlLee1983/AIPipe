@@ -89,3 +89,46 @@ test("resumeInBackground reject 發送 run:rejected", async () => {
 
   expect(events.map((e) => e.type)).toContain("run:rejected");
 });
+
+test("startInBackground 遇到未預期錯誤時更新狀態為 failed 且發送 run:failed", async () => {
+  const badDriver = {
+    run: async () => {
+      throw new Error("意料之外的錯誤");
+    },
+  } as any;
+  const d = deps(badDriver);
+  const bus = new EventBus();
+  const events: ServerEvent[] = [];
+  bus.subscribe((e) => events.push(e));
+
+  const run = createRun(d, wf, {}, yaml);
+  startInBackground(d, bus, run, wf);
+  await wait(20);
+
+  expect(events.map((e) => e.type)).toContain("run:failed");
+  expect(d.runs.get(run.id)!.status).toBe("failed");
+});
+
+test("resumeInBackground 遇到未預期錯誤時更新狀態為 failed 且發送 run:failed", async () => {
+  const d = deps(new MockDriver([{ output: "草稿內容" }]));
+  const bus = new EventBus();
+  const events: ServerEvent[] = [];
+  bus.subscribe((e) => events.push(e));
+
+  const run = createRun(d, wf, {}, yaml);
+  startInBackground(d, bus, run, wf);
+  await wait(20);
+
+  const prep = prepareResume(d, run.id, { approve: true });
+  d.driver = {
+    run: async () => {
+      throw new Error("續跑時發生錯誤");
+    },
+  } as any;
+  resumeInBackground(d, bus, prep);
+  await wait(20);
+
+  expect(events.map((e) => e.type)).toContain("run:failed");
+  expect(d.runs.get(run.id)!.status).toBe("failed");
+});
+
