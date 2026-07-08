@@ -1,0 +1,228 @@
+:root {
+  --bg-dark: #1a1817;
+  --bg-panel: #262220;
+  --bg-parchment: #4a3c31;
+  --color-gold: #d4af37;
+  --color-gold-light: #f3e5ab;
+  --color-text: #e8e2d8;
+  --color-muted: #9c9288;
+  --color-success: #4caf50;
+  --color-danger: #f44336;
+  --color-warning: #ff9800;
+  --border-gold: 1px solid var(--color-gold);
+  --shadow-guild: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--color-text);
+  font-family: "Georgia", "Times New Roman", serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.guild-hall {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  width: 100%;
+}
+
+.guild-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: var(--bg-panel);
+  border: var(--border-gold);
+  border-radius: 8px;
+  box-shadow: var(--shadow-guild);
+  margin-bottom: 1rem;
+}
+
+.guild-title {
+  color: var(--color-gold);
+  font-size: 2rem;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  letter-spacing: 1px;
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  background: var(--bg-dark);
+  border: 1px solid var(--color-muted);
+  border-radius: 20px;
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-indicator.connected {
+  background-color: var(--color-success);
+  box-shadow: 0 0 8px var(--color-success);
+}
+
+.status-indicator.connecting {
+  background-color: var(--color-warning);
+  box-shadow: 0 0 8px var(--color-warning);
+}
+
+.status-indicator.disconnected {
+  background-color: var(--color-danger);
+  box-shadow: 0 0 8px var(--color-danger);
+}
+
+.guild-nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 1rem;
+  background: var(--bg-panel);
+  color: var(--color-text);
+  border: 1px solid var(--color-muted);
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  background: var(--bg-parchment);
+  color: var(--color-gold-light);
+  border-color: var(--color-gold);
+}
+
+.tab-btn.active {
+  background: var(--bg-parchment);
+  color: var(--color-gold);
+  border: var(--border-gold);
+  font-weight: bold;
+  box-shadow: var(--shadow-guild);
+}
+
+.guild-content {
+  flex: 1;
+  background: var(--bg-panel);
+  border: var(--border-gold);
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: var(--shadow-guild);
+}
+
+.panel-title {
+  color: var(--color-gold-light);
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--bg-parchment);
+  padding-bottom: 0.5rem;
+}
+
+.quest-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.quest-card {
+  background: var(--bg-parchment);
+  border: 1px solid var(--color-gold);
+  border-radius: 6px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.quest-card h3 {
+  color: var(--color-gold-light);
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.quest-card p {
+  color: var(--color-text);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.quest-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  border-top: 1px solid rgba(212, 175, 55, 0.3);
+  padding-top: 0.8rem;
+}
+
+.status-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.status-badge.running {
+  background: var(--color-warning);
+  color: #000;
+}
+
+.status-badge.completed {
+  background: var(--color-success);
+  color: #fff;
+}
+
+.status-badge.failed, .status-badge.rejected {
+  background: var(--color-danger);
+  color: #fff;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.guild-footer {
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  border-top: 1px solid var(--bg-parchment);
+}

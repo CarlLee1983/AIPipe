@@ -7,7 +7,10 @@
   "scripts": {
     "test": "bun test",
     "cli": "bun run src/cli/index.ts",
-    "server": "bun run src/server/index.ts"
+    "server": "bun run src/server/index.ts",
+    "dev:server": "bun run src/server/index.ts",
+    "dev:web": "cd web && bun run dev",
+    "build:web": "cd web && bun run build"
   },
   "dependencies": {
     "yaml": "^2.5.0",
