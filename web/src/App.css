@@ -148,7 +148,7 @@ body {
   padding-bottom: 0.5rem;
 }
 
-.quest-list {
+.quest-list, .quest-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
@@ -163,19 +163,68 @@ body {
   flex-direction: column;
   justify-content: space-between;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.quest-card h3 {
+.quest-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.quest-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.quest-title, .quest-card h3 {
   color: var(--color-gold-light);
-  margin-bottom: 0.5rem;
   font-size: 1.2rem;
+  font-weight: bold;
 }
 
-.quest-card p {
+.quest-badge {
+  background: var(--bg-dark);
+  color: var(--color-gold);
+  border: 1px solid var(--color-gold);
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.quest-desc, .quest-card p {
   color: var(--color-text);
   font-size: 0.95rem;
-  margin-bottom: 1rem;
-  line-height: 1.4;
+  margin-bottom: 1.2rem;
+  line-height: 1.5;
+}
+
+.quest-card-footer {
+  border-top: 1px solid rgba(212, 175, 55, 0.3);
+  padding-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-accept {
+  background: var(--bg-dark);
+  color: var(--color-gold);
+  border: 1px solid var(--color-gold);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-accept:hover {
+  background: var(--color-gold);
+  color: var(--bg-dark);
+  font-weight: bold;
 }
 
 .quest-meta {
@@ -186,6 +235,178 @@ body {
   color: var(--color-muted);
   border-top: 1px solid rgba(212, 175, 55, 0.3);
   padding-top: 0.8rem;
+}
+
+/* Quest Board & Modal Styles */
+.quest-board-container {
+  width: 100%;
+}
+
+.status-loading, .status-error, .empty-notice {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+  color: var(--color-gold-light);
+}
+
+.status-error {
+  color: var(--color-danger);
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid var(--color-danger);
+  border-radius: 6px;
+}
+
+.quest-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.quest-modal {
+  background: var(--bg-panel);
+  border: 2px solid var(--color-gold);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+  padding: 2rem;
+  color: var(--color-text);
+}
+
+.quest-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--bg-parchment);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.quest-modal-header h2 {
+  color: var(--color-gold);
+  font-size: 1.4rem;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.btn-close:hover {
+  color: var(--color-gold);
+}
+
+.quest-modal-desc {
+  color: var(--color-text);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.quest-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: var(--color-gold-light);
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.required-mark {
+  color: var(--color-warning);
+  font-size: 0.85rem;
+  margin-left: 0.3rem;
+}
+
+.form-group textarea, .form-group input {
+  background: var(--bg-dark);
+  border: 1px solid var(--color-muted);
+  border-radius: 4px;
+  padding: 0.8rem;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.form-group textarea:focus, .form-group input:focus {
+  outline: none;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.4);
+}
+
+.no-inputs-notice {
+  font-style: italic;
+  color: var(--color-muted);
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.quest-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid var(--bg-parchment);
+  padding-top: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.btn-cancel, .btn-launch {
+  padding: 0.7rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel {
+  background: var(--bg-dark);
+  color: var(--color-muted);
+  border: 1px solid var(--color-muted);
+}
+
+.btn-cancel:hover:not(:disabled) {
+  color: var(--color-text);
+  border-color: var(--color-text);
+}
+
+.btn-launch {
+  background: var(--color-gold);
+  color: var(--bg-dark);
+  border: 1px solid var(--color-gold);
+  font-weight: bold;
+}
+
+.btn-launch:hover:not(:disabled) {
+  background: var(--color-gold-light);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+}
+
+.btn-cancel:disabled, .btn-launch:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .status-badge {

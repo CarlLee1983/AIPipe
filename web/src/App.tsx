@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { createClient, type Run, type WorkflowSummary } from "./client";
+import { createClient, type Run } from "./client";
+import { QuestBoard } from "./components/QuestBoard";
 import "./App.css";
 
 type TabType = "new-quest" | "active-quests" | "history";
@@ -8,7 +9,6 @@ type ConnectionStatus = "connecting" | "connected" | "disconnected";
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>("new-quest");
   const [status, setStatus] = useState<ConnectionStatus>("connecting");
-  const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
   const [runs, setRuns] = useState<Run[]>([]);
 
   const client = useMemo(() => createClient(), []);
@@ -18,12 +18,8 @@ export default function App() {
 
     async function fetchData() {
       try {
-        const [wfList, runList] = await Promise.all([
-          client.listWorkflows(),
-          client.listRuns(),
-        ]);
+        const runList = await client.listRuns();
         if (isMounted) {
-          setWorkflows(wfList);
           setRuns(runList);
           setStatus("connected");
         }
@@ -100,26 +96,12 @@ export default function App() {
         {activeTab === "new-quest" && (
           <section>
             <h2 className="panel-title">接取委託 / 任務板</h2>
-            {workflows.length === 0 ? (
-              <div className="empty-state">
-                目前公會任務板上沒有可接取的委託任務...
-              </div>
-            ) : (
-              <div className="quest-list">
-                {workflows.map((wf) => (
-                  <div key={wf.name} className="quest-card">
-                    <div>
-                      <h3>{wf.name}</h3>
-                      <p>{wf.description || "公會發佈之標準冒險委託。"}</p>
-                    </div>
-                    <div className="quest-meta">
-                      <span>階段數量: {wf.stageCount}</span>
-                      <span>可接取</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <QuestBoard
+              client={client}
+              onQuestStarted={() => {
+                setActiveTab("active-quests");
+              }}
+            />
           </section>
         )}
 
