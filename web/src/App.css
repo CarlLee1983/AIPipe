@@ -447,3 +447,357 @@ body {
   font-size: 0.9rem;
   border-top: 1px solid var(--bg-parchment);
 }
+
+/* ActiveQuests & RunView Styles */
+.active-quests-container {
+  width: 100%;
+}
+
+.active-quests-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .active-quests-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.run-list-sidebar {
+  background: var(--bg-panel);
+  border: 1px solid var(--color-gold);
+  border-radius: 8px;
+  padding: 1.2rem;
+}
+
+.run-list-sidebar h3 {
+  color: var(--color-gold-light);
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  border-bottom: 1px solid var(--bg-parchment);
+  padding-bottom: 0.5rem;
+}
+
+.run-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.run-list-item {
+  background: var(--bg-parchment);
+  border: 1px solid var(--color-gold);
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.run-list-item:hover {
+  transform: translateX(4px);
+  border-color: var(--color-gold-light);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
+}
+
+.run-list-item.selected {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: var(--color-gold-light);
+  box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+.run-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.run-item-header strong {
+  color: var(--color-gold-light);
+  font-size: 0.95rem;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.running { background: var(--color-warning); box-shadow: 0 0 6px var(--color-warning); }
+.status-dot.paused { background: #64b5f6; }
+.status-dot.completed { background: var(--color-success); }
+.status-dot.failed, .status-dot.rejected { background: var(--color-danger); }
+.status-dot.pending { background: var(--color-muted); }
+
+.run-item-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.run-item-status {
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.run-item-date {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.run-view-container {
+  min-width: 0;
+}
+
+.no-run-selected {
+  background: var(--bg-panel);
+  border: 1px dashed var(--color-gold);
+  border-radius: 8px;
+  padding: 3rem;
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.no-run-selected h3 {
+  color: var(--color-gold-light);
+  margin-bottom: 0.5rem;
+}
+
+.run-view {
+  background: var(--bg-panel);
+  border: 1px solid var(--color-gold);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.run-view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--bg-parchment);
+  padding-bottom: 1rem;
+}
+
+.run-view-header h2 {
+  color: var(--color-gold);
+  font-size: 1.4rem;
+  margin-bottom: 0.2rem;
+}
+
+.run-id-label {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.run-view-status .status-badge {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+}
+
+.status-badge.paused {
+  background: #1976d2;
+  color: #fff;
+}
+
+.status-badge.pending {
+  background: var(--color-muted);
+  color: #fff;
+}
+
+.checkpoint-banner {
+  background: rgba(255, 193, 7, 0.12);
+  border: 2px solid var(--color-warning);
+  border-radius: 8px;
+  padding: 1.2rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+}
+
+.checkpoint-icon {
+  font-size: 2rem;
+}
+
+.checkpoint-content h3 {
+  color: var(--color-warning);
+  margin-bottom: 0.5rem;
+}
+
+.checkpoint-prompt {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.8rem;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  border-left: 3px solid var(--color-warning);
+  font-family: monospace;
+  white-space: pre-wrap;
+}
+
+.checkpoint-notice {
+  font-size: 0.85rem;
+  color: var(--color-gold-light);
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+.stages-section h3, .log-stream-section h3 {
+  color: var(--color-gold-light);
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.stage-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stage-card {
+  background: var(--bg-dark);
+  border: 1px solid var(--color-muted);
+  border-left: 4px solid var(--color-muted);
+  border-radius: 6px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.stage-card.running {
+  border-left-color: var(--color-warning);
+  border-color: rgba(255, 193, 7, 0.5);
+  box-shadow: 0 0 12px rgba(255, 193, 7, 0.15);
+}
+
+.stage-card.completed {
+  border-left-color: var(--color-success);
+  border-color: rgba(76, 175, 80, 0.4);
+}
+
+.stage-card.failed {
+  border-left-color: var(--color-danger);
+  border-color: rgba(244, 67, 54, 0.4);
+}
+
+.stage-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stage-card-header h4 {
+  color: var(--color-gold-light);
+  font-size: 1.05rem;
+}
+
+.stage-status-tag {
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.stage-status-tag.running { color: var(--color-warning); }
+.stage-status-tag.completed { color: var(--color-success); }
+.stage-status-tag.failed { color: var(--color-danger); }
+.stage-status-tag.pending { color: var(--color-muted); }
+
+.stage-agent {
+  font-size: 0.9rem;
+  color: var(--color-text);
+  background: rgba(212, 175, 55, 0.08);
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  display: inline-block;
+  align-self: flex-start;
+}
+
+.stage-prompt, .stage-output, .stage-error {
+  font-size: 0.9rem;
+}
+
+.stage-prompt strong, .stage-output strong, .stage-error strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--color-gold-light);
+}
+
+.stage-prompt pre, .stage-output pre, .stage-error pre {
+  background: #0f0f13;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 0.8rem;
+  font-family: monospace;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 200px;
+  overflow-y: auto;
+  color: #dcdcdc;
+}
+
+.stage-output pre {
+  border-left: 3px solid var(--color-success);
+}
+
+.stage-error pre {
+  border-left: 3px solid var(--color-danger);
+  color: #ff8a80;
+}
+
+.log-stream {
+  background: #0e0e12;
+  border: 2px solid var(--color-gold);
+  border-radius: 6px;
+  padding: 1rem;
+  font-family: monospace;
+  max-height: 320px;
+  overflow-y: auto;
+  color: #e0e0e0;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.9);
+}
+
+.log-empty {
+  color: var(--color-muted);
+  font-style: italic;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.log-entry {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+  border-bottom: 1px dashed #22222a;
+  padding-bottom: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.log-time {
+  color: var(--color-gold);
+  font-weight: bold;
+}
+
+.log-message {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.log-entry.stage-done .log-message { color: #a5d6a7; }
+.log-entry.run-failed .log-message, .log-entry.run-rejected .log-message { color: #ef9a9a; }
+.log-entry.run-checkpoint .log-message { color: #ffe082; font-weight: bold; }
+

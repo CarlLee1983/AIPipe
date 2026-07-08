@@ -37,6 +37,7 @@ export function QuestBoard({ client, onQuestStarted }: QuestBoardProps) {
 
   const handleSelect = (wf: WorkflowSummary) => {
     setSelectedWf(wf);
+    setError(null);
     const initial: Record<string, string> = {};
     if (wf.inputs) {
       for (const inp of wf.inputs) {
@@ -75,7 +76,7 @@ export function QuestBoard({ client, onQuestStarted }: QuestBoardProps) {
 
   return (
     <div className="quest-board-container">
-      {error && <div className="status-error" style={{ marginBottom: "1rem" }}>⚠️ {error}</div>}
+      {error && !selectedWf && <div className="status-error" style={{ marginBottom: "1rem" }}>⚠️ {error}</div>}
 
       <div className="quest-grid">
         {workflows.map((wf) => (
@@ -89,9 +90,10 @@ export function QuestBoard({ client, onQuestStarted }: QuestBoardProps) {
           <div className="quest-modal">
             <div className="quest-modal-header">
               <h2>⚔️ 簽署委託契約：{selectedWf.name}</h2>
-              <button className="btn-close" onClick={() => setSelectedWf(null)}>✖</button>
+              <button className="btn-close" onClick={() => { setSelectedWf(null); setError(null); }}>✖</button>
             </div>
             <p className="quest-modal-desc">{selectedWf.description || "請填寫以下情報，冒險隊伍將立即出發。"}</p>
+            {error && <div className="status-error" style={{ marginBottom: "1rem" }}>⚠️ {error}</div>}
 
             <form onSubmit={handleSubmit} className="quest-form">
               {selectedWf.inputs && selectedWf.inputs.length > 0 ? (
@@ -115,7 +117,7 @@ export function QuestBoard({ client, onQuestStarted }: QuestBoardProps) {
               )}
 
               <div className="quest-form-actions">
-                <button type="button" className="btn-cancel" onClick={() => setSelectedWf(null)} disabled={submitting}>
+                <button type="button" className="btn-cancel" onClick={() => { setSelectedWf(null); setError(null); }} disabled={submitting}>
                   取消 (Cancel)
                 </button>
                 <button type="submit" className="btn-launch" disabled={submitting}>

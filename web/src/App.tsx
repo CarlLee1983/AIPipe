@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createClient, type Run } from "./client";
 import { QuestBoard } from "./components/QuestBoard";
+import { ActiveQuests } from "./components/ActiveQuests";
 import "./App.css";
 
 type TabType = "new-quest" | "active-quests" | "history";
@@ -8,6 +9,7 @@ type ConnectionStatus = "connecting" | "connected" | "disconnected";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>("new-quest");
+  const [activeRunId, setActiveRunId] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<ConnectionStatus>("connecting");
   const [runs, setRuns] = useState<Run[]>([]);
 
@@ -98,7 +100,8 @@ export default function App() {
             <h2 className="panel-title">接取委託 / 任務板</h2>
             <QuestBoard
               client={client}
-              onQuestStarted={() => {
+              onQuestStarted={(runId) => {
+                setActiveRunId(runId);
                 setActiveTab("active-quests");
               }}
             />
@@ -108,28 +111,7 @@ export default function App() {
         {activeTab === "active-quests" && (
           <section>
             <h2 className="panel-title">進行中任務</h2>
-            {activeRuns.length === 0 ? (
-              <div className="empty-state">
-                目前沒有正在執行中的冒險委託。
-              </div>
-            ) : (
-              <div className="quest-list">
-                {activeRuns.map((r) => (
-                  <div key={r.id} className="quest-card">
-                    <div>
-                      <h3>{r.workflowName}</h3>
-                      <p>委託編號: {r.id.slice(0, 8)}</p>
-                    </div>
-                    <div className="quest-meta">
-                      <span className={`status-badge ${r.status}`}>
-                        {r.status}
-                      </span>
-                      <span>階段: {r.currentStageIndex}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <ActiveQuests client={client} initialRunId={activeRunId} />
           </section>
         )}
 
