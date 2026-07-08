@@ -2,7 +2,6 @@ export type AssetKey =
   | "scene-bg"
   | "npc-master"
   | "player"
-  | "adventurer"
   | "sfx-cursor"
   | "sfx-confirm"
   | "sfx-complete";
@@ -11,7 +10,6 @@ const ASSETS: Record<AssetKey, string | null> = {
   "scene-bg": "/assets/scene-bg.png",
   "npc-master": "/assets/npc-master.png",
   player: "/assets/player.png",
-  adventurer: "/assets/adventurer.png",
   "sfx-cursor": null,
   "sfx-confirm": null,
   "sfx-complete": null,

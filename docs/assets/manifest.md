@@ -24,9 +24,10 @@ python3 scripts/prepare-pixel-asset.py \
 | `scene-bg` | `scene-bg.png` | 大廳場景背景 | 4:3（建議 960×720 以上） | top-down guild hall interior, warm stone floor, wooden counter, banners, sunlit |
 | `npc-master` | `npc-master.png` | 公會主 | 透明背景；高度約為場景 **31%**（與 player 同比例尺） | guild master NPC, bearded, robed, front-facing pixel sprite |
 | `player` | `player.png` | 玩家角色 | 透明背景；高度約為場景 **34%** | young adventurer hero sprite, front-facing, sword on back |
-| `adventurer` | `adventurer.png` | 氛圍冒險者（3 位置共用，以 hue-rotate 區分） | 透明背景；高度約為場景 **27%**（略小表現後景） | generic adventurer townsperson sprite, front-facing |
 
 > 對話頭像不另外生成：直接重用全身像 `npc-master` / `player`，由 `DialogBox` 的 `PORTRAIT_CROP` 以百分比框裁切聚焦頭部（見 `web/src/components/DialogBox.tsx`）。日後若要專屬頭像，新增 AssetKey + 裁切設定即可。
+>
+> 氛圍路人（`adventurer`）已先移除：原 48×72 像素圖品質不佳。日後若要重加，可生成 `generic adventurer townsperson sprite, front-facing`（高度約場景 27%），並重建 `AmbientAdventurers` 元件與 `adventurer` AssetKey。
 
 ## 可選音效
 

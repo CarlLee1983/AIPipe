@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { assetPath } from "../assets/assets.config";
-import { AmbientAdventurers } from "./AmbientAdventurers";
 
 export function Scene({ children }: { children: ReactNode }) {
   const bg = assetPath("scene-bg");
@@ -22,7 +21,6 @@ export function Scene({ children }: { children: ReactNode }) {
           <div className="scene-dust scene-dust-4" />
           <div className="scene-dust scene-dust-5" />
         </div>
-        <AmbientAdventurers />
         <div className="scene-characters">
           {children}
         </div>

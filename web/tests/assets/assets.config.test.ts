@@ -1,5 +1,4 @@
 import { expect, test } from "bun:test";
-import { hasSvgFallback } from "../../src/assets/svg-fallbacks";
 import { assetPath, hasAsset } from "../../src/assets/assets.config";
 
 test("主要場景素材已接入", () => {
@@ -11,19 +10,14 @@ test("主要場景素材已接入", () => {
   expect(hasAsset("player")).toBe(true);
 });
 
-test("路人像素素材已接入", () => {
-  expect(assetPath("adventurer")).toBe("/assets/adventurer.png");
-  expect(hasAsset("adventurer")).toBe(true);
-});
-
-test("SVG fallback 仍可用於缺圖素材", () => {
-  expect(hasSvgFallback("adventurer")).toBe(true);
+test("sfx 佔位素材尚未接入（路徑為 null）", () => {
   expect(hasAsset("sfx-cursor")).toBe(false);
+  expect(assetPath("sfx-cursor")).toBe(null);
 });
 
 test("所有 key 都可查詢不擲錯", () => {
   for (const key of [
-    "scene-bg", "npc-master", "player", "adventurer",
+    "scene-bg", "npc-master", "player",
     "sfx-cursor", "sfx-confirm", "sfx-complete",
   ] as const) {
     expect(() => hasAsset(key)).not.toThrow();

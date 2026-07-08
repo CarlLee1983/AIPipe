@@ -1,7 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { AssetKey } from "../assets/assets.config";
 import { assetPath } from "../assets/assets.config";
-import { hasSvgFallback, SvgFallback } from "../assets/svg-fallbacks";
 import { useTypewriter } from "../hooks/useTypewriter";
 
 // 全身角色像用作對話頭像時，以百分比框裁切聚焦頭部（相對頭像框；框為正方形）
@@ -30,13 +29,6 @@ function Portrait({ assetKey, label }: { assetKey: AssetKey; label: string }) {
       );
     }
     return <img className="dialog-portrait-img" src={src} alt={label} />;
-  }
-  if (hasSvgFallback(assetKey)) {
-    return (
-      <div className="dialog-portrait-svg" aria-label={label}>
-        <SvgFallback assetKey={assetKey} />
-      </div>
-    );
   }
   return <div className="dialog-portrait-fallback">{label.charAt(0)}</div>;
 }

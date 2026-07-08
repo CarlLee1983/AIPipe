@@ -163,20 +163,6 @@
   z-index: 2;
 }
 
-.ambient-adventurer {
-  position: absolute;
-  z-index: 1;
-  height: var(--char-h-back);
-  aspect-ratio: 2 / 3;
-  width: auto;
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.28));
-  opacity: 0.92;
-}
-
-.ambient-a { left: 5%; bottom: 26%; }
-.ambient-b { right: 6%; bottom: 28%; }
-.ambient-c { left: 16%; bottom: 22%; }
-
 .sprite-body {
   width: 100%;
   height: 100%;

@@ -14,7 +14,7 @@ class FakeEventSource {
   constructor(public url: string) {}
 }
 
-test("Hall 載入後顯示任務佈告欄、NPC 與 SVG 路人", async () => {
+test("Hall 載入後顯示任務佈告欄與 NPC/玩家角色", async () => {
   (globalThis as { EventSource?: typeof FakeEventSource }).EventSource = FakeEventSource;
   globalThis.fetch = (async (input: RequestInfo | URL) => {
     const url = String(input);
@@ -28,6 +28,5 @@ test("Hall 載入後顯示任務佈告欄、NPC 與 SVG 路人", async () => {
   await waitFor(() => expect(root.getByText("任務佈告欄")).toBeDefined());
   expect(root.getByAltText("NPC 公會主")).toBeDefined();
   expect(root.getByAltText("玩家角色")).toBeDefined();
-  expect(root.getByAltText("冒險者 A")).toBeDefined();
   expect(root.getByText("Lv.12")).toBeDefined();
 });
