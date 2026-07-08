@@ -1,11 +1,14 @@
 .cabinet {
+  --cabinet-ratio: 4 / 3;
   font-family: ui-monospace, "Courier New", monospace;
   border: 4px solid #000;
   border-radius: 6px;
   overflow: hidden;
   position: relative;
-  min-height: 540px;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: var(--cabinet-ratio);
+  height: min(100vh, calc(100vw * 3 / 4));
+  max-height: 100vh;
+  max-width: 100vw;
   image-rendering: pixelated;
   box-shadow: inset 0 0 0 2px #e6d9b0;
   /* 角色高度以場景為基準；前中後景差距約 15–25%，避免尺寸斷層 */
@@ -64,23 +67,13 @@
 }
 
 .hall-shell {
-  width: min(1180px, calc(100vw - 32px));
-  margin: 0 auto;
-  display: grid;
-  gap: 14px;
-  padding: 16px;
-}
-
-.hall-layout {
-  display: grid;
-  grid-template-columns: minmax(640px, 1fr) minmax(260px, 320px);
-  gap: 14px;
-  align-items: start;
-}
-
-.hall-sidebar {
-  display: grid;
-  gap: 12px;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: radial-gradient(120% 80% at 50% 0%, var(--bg-dark-2), var(--bg-dark) 70%);
 }
 
 @keyframes light-pulse {
@@ -203,24 +196,8 @@
   z-index: 3;
 }
 
-@media (max-width: 980px) {
-  .hall-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .cabinet {
-    min-height: 460px;
-  }
-}
-
 @media (max-width: 640px) {
-  .hall-shell {
-    width: min(100vw, calc(100vw - 16px));
-    padding: 8px;
-  }
-
   .cabinet {
-    min-height: 360px;
     --char-h-front: 32%;
     --char-h-mid: 29%;
     --char-h-back: 25%;

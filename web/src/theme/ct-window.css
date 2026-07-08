@@ -73,11 +73,6 @@
 .quest-status-failed { color: #ff8a8a; }
 .quest-status-pending { color: #d0d8e8; }
 
-.hud-bar {
-  display: grid;
-  gap: 6px;
-}
-
 .hud-row {
   display: flex;
   align-items: center;
@@ -271,25 +266,117 @@
   color: #ffd6d6;
 }
 
-.detail-screen {
-  display: grid;
-  gap: 14px;
+/* --- 遊戲畫面分層（大廳/詳情） --- */
+.hud-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(11, 26, 74, 0.92), rgba(34, 70, 173, 0.82));
 }
 
-.detail-back {
-  justify-self: start;
-  background: rgba(11, 26, 74, 0.45);
-  border: 1px solid var(--ct-frame);
-  border-radius: 4px;
-  cursor: pointer;
+.command-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-radius: 0;
+}
+
+.command-item {
+  background: none;
+  border: 0;
+  color: inherit;
   font: inherit;
-  font-size: 13px;
-  color: #eaf4ff;
-  padding: 4px 10px;
+  font-size: 15px;
+  cursor: pointer;
   text-shadow: 1px 1px 0 var(--ct-edge);
 }
 
-.detail-back:hover {
-  background: rgba(11, 26, 74, 0.7);
+.command-item:hover {
+  color: #bff4ff;
+}
+
+.overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(4, 8, 20, 0.55);
+}
+
+.overlay-window {
+  position: relative;
+  width: min(78%, 420px);
+  max-height: 80%;
+  overflow-y: auto;
+  animation: screen-in 200ms ease-out;
+}
+
+.overlay-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: 0;
   color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.detail-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  padding-top: 64px;
+  overflow: hidden;
+  background: rgba(6, 10, 26, 0.82);
+  animation: screen-in 200ms ease-out;
+}
+
+.detail-back {
+  align-self: flex-start;
+  background: none;
+  border: 0;
+  color: #bff4ff;
+  font: inherit;
+  cursor: pointer;
+  text-shadow: 1px 1px 0 var(--ct-edge);
+}
+
+.detail-screen .quest-log {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.detail-screen .quest-log-list {
+  flex: 1;
+  max-height: none;
+}
+
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay-window,
+  .detail-screen {
+    animation: none;
+  }
 }
