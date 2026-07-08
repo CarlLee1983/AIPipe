@@ -1,4 +1,4 @@
-import { serve, type Server } from "bun";
+import { serve } from "bun";
 import { join } from "node:path";
 import { openDb } from "../store/db";
 import { RunRepository } from "../store/runs";
@@ -8,17 +8,8 @@ import { createDriver, MockDriver, type Driver } from "../driver";
 import { EventBus } from "./events/bus";
 import { WorkflowCatalog } from "./workflows";
 import { createRunHandler, resumeRunHandler, getRunHandler, listRunsHandler } from "./routes/runs";
-import { sseHandler } from "./sse";
+import { sseHandler, sseResponse } from "./sse";
 import type { EngineDeps } from "../engine/runner";
-import {
-  createRunHandler as createRunResult,
-  decisionHandler,
-  getRunHandler as getRunResult,
-  listRunsHandler as listRunsResult,
-  listWorkflowsHandler,
-  type ApiResult,
-} from "./handlers";
-import { sseResponse } from "./sse";
 
 export interface ServerOptions {
   port?: number;
@@ -26,72 +17,6 @@ export interface ServerOptions {
   workflowsDir?: string;
   staticDir?: string;
   driver?: Driver;
-}
-
-export interface CreateServerOptions {
-  deps: EngineDeps;
-  bus: EventBus;
-  workflowsDir: string;
-  staticDir?: string;
-  port: number;
-}
-
-const resultJson = (result: ApiResult): Response =>
-  new Response(JSON.stringify(result.body), {
-    status: result.status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-export function createServer(opts: CreateServerOptions): Server {
-  const { deps, bus, workflowsDir, staticDir } = opts;
-
-  return serve({
-    port: opts.port,
-    async fetch(req) {
-      const url = new URL(req.url);
-      const path = url.pathname;
-      const method = req.method;
-
-      if (path === "/api/workflows" && method === "GET") {
-        return resultJson(await listWorkflowsHandler(workflowsDir));
-      }
-      if (path === "/api/runs" && method === "GET") {
-        return resultJson(listRunsResult(deps));
-      }
-      if (path === "/api/runs" && method === "POST") {
-        return resultJson(await createRunResult(deps, bus, workflowsDir, await safeJson(req)));
-      }
-
-      const runMatch = path.match(/^\/api\/runs\/([^/]+)$/);
-      if (runMatch && method === "GET") {
-        return resultJson(getRunResult(deps, decodeURIComponent(runMatch[1])));
-      }
-
-      const approveMatch = path.match(/^\/api\/runs\/([^/]+)\/approve$/);
-      if (approveMatch && method === "POST") {
-        return resultJson(decisionHandler(deps, bus, decodeURIComponent(approveMatch[1]), true, await safeJson(req)));
-      }
-
-      const rejectMatch = path.match(/^\/api\/runs\/([^/]+)\/reject$/);
-      if (rejectMatch && method === "POST") {
-        return resultJson(decisionHandler(deps, bus, decodeURIComponent(rejectMatch[1]), false, await safeJson(req)));
-      }
-
-      const eventsMatch = path.match(/^\/api\/events\/([^/]+)$/);
-      if (eventsMatch && method === "GET") {
-        return sseResponse(deps, bus, decodeURIComponent(eventsMatch[1]));
-      }
-
-      if (staticDir && method === "GET") {
-        const file = Bun.file(join(staticDir, path === "/" ? "index.html" : path));
-        if (await file.exists()) return new Response(file);
-        const index = Bun.file(join(staticDir, "index.html"));
-        if (await index.exists()) return new Response(index);
-      }
-
-      return new Response("Not Found", { status: 404 });
-    },
-  });
 }
 
 async function safeJson(req: Request): Promise<unknown> {
@@ -103,7 +28,7 @@ async function safeJson(req: Request): Promise<unknown> {
 }
 
 export function startServer(options: ServerOptions = {}) {
-  const db = openDb(options.dbPath ?? "aipipe.db");
+  const db = openDb(options.dbPath ?? "./aipipe.sqlite");
   const deps: EngineDeps = {
     runs: new RunRepository(db),
     steps: new StepRepository(db),
@@ -126,7 +51,7 @@ export function startServer(options: ServerOptions = {}) {
     return res;
   }
 
-  const server: Server = serve({
+  const server = serve({
     port: options.port ?? 3000,
     async fetch(req: Request): Promise<Response> {
       if (req.method === "OPTIONS") {
@@ -235,7 +160,7 @@ export function startServer(options: ServerOptions = {}) {
 
 export function main() {
   const port = process.env.AIPIPE_PORT ? parseInt(process.env.AIPIPE_PORT, 10) : 3000;
-  const dbPath = process.env.AIPIPE_DB ?? "aipipe.db";
+  const dbPath = process.env.AIPIPE_DB ?? "./aipipe.sqlite";
   const workflowsDir = process.env.AIPIPE_WORKFLOWS ?? "workflows";
   const staticDir = process.env.AIPIPE_STATIC;
   const driver = process.env.AIPIPE_MOCK === "1"

@@ -48,7 +48,7 @@ test("POST createRunHandler 建立並背景執行回 201", async () => {
   const req = jsonReq("POST", "http://localhost/api/runs", { workflow: "demo" });
   const res = await createRunHandler(req, deps, catalog, bus);
   expect(res.status).toBe(201);
-  const data = await res.json();
+  const data = await res.json() as any;
   expect(data.status).toBe("running");
   expect(data.workflow).toBe("demo");
   expect(typeof data.runId).toBe("string");
@@ -72,11 +72,11 @@ test("GET getRunHandler 取得 run 詳細資料；找不到回 404", async () =>
   const { deps, catalog, bus } = setup();
   const req = jsonReq("POST", "http://localhost/api/runs", { workflow: "demo" });
   const createRes = await createRunHandler(req, deps, catalog, bus);
-  const { runId } = await createRes.json();
+  const { runId } = await createRes.json() as any;
 
   const getRes = await getRunHandler(new Request(`http://localhost/api/runs/${runId}`), deps, runId);
   expect(getRes.status).toBe(200);
-  const runData = await getRes.json();
+  const runData = await getRes.json() as any;
   expect(runData.run.id).toBe(runId);
   expect(Array.isArray(runData.steps)).toBe(true);
   expect(Array.isArray(runData.checkpoints)).toBe(true);
@@ -88,7 +88,7 @@ test("GET getRunHandler 取得 run 詳細資料；找不到回 404", async () =>
 test("POST resumeRunHandler 在 paused 狀態 approve 回 200；非 paused 回 409", async () => {
   const { deps, catalog, bus } = setup();
   const req = jsonReq("POST", "http://localhost/api/runs", { workflow: "demo" });
-  const { runId } = await (await createRunHandler(req, deps, catalog, bus)).json();
+  const { runId } = await (await createRunHandler(req, deps, catalog, bus)).json() as any;
 
   // 等待跑完第一關進入 paused
   await new Promise((r) => setTimeout(r, 30));
@@ -97,7 +97,7 @@ test("POST resumeRunHandler 在 paused 狀態 approve 回 200；非 paused 回 4
   const resumeReq = jsonReq("POST", `http://localhost/api/runs/${runId}/resume`, { approve: true });
   const res = await resumeRunHandler(resumeReq, deps, catalog, bus, runId);
   expect(res.status).toBe(200);
-  const data = await res.json();
+  const data = await res.json() as any;
   expect(data.status).toBe("running");
 
   // 已不是 paused 狀態再次 resume 回 409
@@ -114,7 +114,7 @@ test("GET listRunsHandler 取得所有 runs 列表", async () => {
   await createRunHandler(req, deps, catalog, bus);
   const listRes = await listRunsHandler(new Request("http://localhost/api/runs"), deps);
   expect(listRes.status).toBe(200);
-  const runs = await listRes.json();
+  const runs = await listRes.json() as any;
   expect(runs.length).toBe(1);
   expect(runs[0].workflowName).toBe("demo");
 });

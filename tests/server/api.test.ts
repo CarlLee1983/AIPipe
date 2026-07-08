@@ -98,6 +98,6 @@ test("HTTP Server 靜態檔案服務與 SPA Routing 測試", async () => {
   // 3. 請求不存在之 /api 路徑，不應 fallback，而應回傳 404
   const apiRes = await fetch(`${baseUrl}/api/unknown`);
   expect(apiRes.status).toBe(404);
-  const json = await apiRes.json();
+  const json = await apiRes.json() as any;
   expect(json.error).toBe("Not found");
 });

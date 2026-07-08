@@ -44,7 +44,7 @@ export async function createRunHandler(
 
   let run;
   try {
-    run = createRun(deps, workflow, val.data.inputs, summary.rawYaml);
+    run = createRun(deps, workflow, val.data.inputs ?? {}, summary.rawYaml);
   } catch (err) {
     return json({ error: err instanceof Error ? err.message : String(err) }, 400);
   }

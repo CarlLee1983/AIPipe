@@ -1,5 +1,5 @@
 import type { ServerEvent } from "./events/bus";
-import type { Run } from "../schema/run";
+import type { Run } from "../store/runs";
 import type { StepRecord } from "../store/steps";
 import type { CheckpointRecord } from "../store/checkpoints";
 import type { WorkflowSummary } from "./workflows";
@@ -24,7 +24,7 @@ export interface ApiClient {
 export function createClient(baseUrl: string): ApiClient {
   const url = (path: string) => `${baseUrl.replace(/\/$/, "")}${path}`;
 
-  async function handleRes(res: Response) {
+  async function handleRes<T>(res: Response): Promise<T> {
     if (!res.ok) {
       const text = await res.text();
       let msg = text;
@@ -34,7 +34,7 @@ export function createClient(baseUrl: string): ApiClient {
       } catch {}
       throw new Error(`API Request Failed (${res.status}): ${msg}`);
     }
-    return res.json();
+    return res.json() as Promise<T>;
   }
 
   return {

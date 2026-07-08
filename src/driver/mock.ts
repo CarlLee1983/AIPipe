@@ -4,6 +4,7 @@ export type MockResponse = {
   output: string;
   success?: boolean;
   raw?: unknown;
+  delayMs?: number;
 };
 
 type Responder = MockResponse[] | ((input: DriverInput) => MockResponse);
@@ -28,6 +29,9 @@ export class MockDriver implements AgentDriver {
     const response = this.fn ? this.fn(input) : this.queue!.shift();
     if (!response) {
       throw new Error(`MockDriver：預錄回應已用盡（第 ${this.calls.length} 次呼叫）`);
+    }
+    if (response.delayMs) {
+      await new Promise((resolve) => setTimeout(resolve, response.delayMs));
     }
     return {
       output: response.output,

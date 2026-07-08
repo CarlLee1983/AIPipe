@@ -43,7 +43,7 @@ export function validateBody<T>(schema: z.ZodType<T>, raw: unknown): ValidationR
 export function parseCreateRunBody(raw: unknown): CreateRunBody {
   const res = validateBody(CreateRunSchema, raw ?? {});
   if (!res.success) throw new ValidationError(`request body 不合法：${res.error}`);
-  return { workflow: res.data.workflow, inputs: res.data.inputs };
+  return { workflow: res.data.workflow, inputs: res.data.inputs ?? {} };
 }
 
 export function parseDecisionBody(raw: unknown): DecisionBody {
