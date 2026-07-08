@@ -26,11 +26,13 @@ export function ActiveQuests({ client, initialRunId }: ActiveQuestsProps) {
         const list = await client.listRuns();
         if (isMounted) {
           setRuns(list);
+          setError(null);
           setLoading(false);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (isMounted) {
-          setError(err.message || "載入委託清單失敗");
+          const msg = err instanceof Error ? err.message : "載入委託清單失敗";
+          setError(msg);
           setLoading(false);
         }
       }

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import type { ApiClient, ServerEvent } from "../client";
+import { CheckpointReview } from "./CheckpointReview";
 
 export interface RunViewProps {
   client: ApiClient;
   runId: string;
 }
 
-interface StageCardData {
+export interface StageCardData {
   stageId: string;
   index: number;
   name?: string;
@@ -17,7 +18,7 @@ interface StageCardData {
   error?: string;
 }
 
-interface LogEntry {
+export interface LogEntry {
   id: string;
   timestamp: number;
   type: string;
@@ -26,8 +27,69 @@ interface LogEntry {
 
 interface CheckpointData {
   stageId: string;
+  stageIndex?: number;
   prompt: string;
   checkpointId: string;
+}
+
+export function StageCard({ stage }: { stage: StageCardData }) {
+  return (
+    <div className={`stage-card ${stage.status}`}>
+      <div className="stage-card-header">
+        <h4>
+          第 {stage.index + 1} 關：{stage.name || stage.stageId}
+        </h4>
+        <span className={`stage-status-tag ${stage.status}`}>
+          {stage.status === "running" && "⏳ 挑戰中 (Running)"}
+          {stage.status === "completed" && "✅ 突破成功 (Completed)"}
+          {stage.status === "failed" && "💀 挑戰失敗 (Failed)"}
+          {stage.status === "pending" && "⏳ 等待中 (Pending)"}
+        </span>
+      </div>
+      {stage.agentName && (
+        <div className="stage-agent">
+          🧙‍♂️ 負責夥伴 (Agent): <strong>{stage.agentName}</strong>
+        </div>
+      )}
+      {stage.prompt && (
+        <div className="stage-prompt">
+          <strong>📜 任務指示 (Prompt):</strong>
+          <pre>{stage.prompt}</pre>
+        </div>
+      )}
+      {stage.output && (
+        <div className="stage-output">
+          <strong>💎 產出成果 (Output):</strong>
+          <pre>{stage.output}</pre>
+        </div>
+      )}
+      {stage.error && (
+        <div className="stage-error">
+          <strong>❌ 失敗原因 (Error):</strong>
+          <pre>{stage.error}</pre>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function LogStream({ logs }: { logs: LogEntry[] }) {
+  return (
+    <div className="log-stream">
+      {logs.length === 0 ? (
+        <div className="log-empty">⏳ 魔法捲軸準備就緒，等待事件記錄...</div>
+      ) : (
+        logs.map((log) => (
+          <div key={log.id} className={`log-entry ${log.type.replace(":", "-")}`}>
+            <span className="log-time">
+              [{new Date(log.timestamp).toLocaleTimeString()}]
+            </span>{" "}
+            <span className="log-message">{log.message}</span>
+          </div>
+        ))
+      )}
+    </div>
+  );
 }
 
 export function RunView({ client, runId }: RunViewProps) {
@@ -59,7 +121,7 @@ export function RunView({ client, runId }: RunViewProps) {
           stageId: s.stageId,
           index: s.stageIndex,
           agentName: s.agentName,
-          status: (s.status === "completed" ? "completed" : s.status === "failed" ? "failed" : "running") as any,
+          status: s.status === "completed" ? "completed" : s.status === "failed" ? "failed" : s.status === "pending" ? "pending" : "running",
           prompt: s.input,
           output: s.output,
           error: s.error,
@@ -87,6 +149,7 @@ export function RunView({ client, runId }: RunViewProps) {
         if (pendingCp) {
           setCurrentCheckpoint({
             stageId: `stage-${pendingCp.stageIndex}`,
+            stageIndex: pendingCp.stageIndex,
             prompt: pendingCp.prompt,
             checkpointId: pendingCp.id,
           });
@@ -117,7 +180,7 @@ export function RunView({ client, runId }: RunViewProps) {
             type: event.type,
             message: msg,
           };
-          return [...prev, entry];
+          return [...prev, entry].slice(-300);
         });
 
         // Update state based on event type
@@ -279,19 +342,19 @@ export function RunView({ client, runId }: RunViewProps) {
       </header>
 
       {currentCheckpoint && status === "paused" && (
-        <div className="checkpoint-banner">
-          <div className="checkpoint-header">
-            <span className="checkpoint-icon">⚠️</span>
-            <h3>觸發決策點！(Checkpoint Triggered)</h3>
-          </div>
-          <div className="checkpoint-content">
-            <p><strong>關卡：</strong> {currentCheckpoint.stageId}</p>
-            <p className="checkpoint-prompt">{currentCheckpoint.prompt}</p>
-            <div className="checkpoint-notice">
-              🛡️ 冒險隊伍正在等待公會指示... (審核與決策操作介面將於 Task 13 整合)
-            </div>
-          </div>
-        </div>
+        <CheckpointReview
+          client={client}
+          runId={runId}
+          checkpoint={{
+            stageId: currentCheckpoint.stageId,
+            stageIndex: currentCheckpoint.stageIndex,
+            prompt: currentCheckpoint.prompt,
+          }}
+          onResolved={() => {
+            setStatus("running");
+            setCurrentCheckpoint(null);
+          }}
+        />
       )}
 
       <section className="stages-section">
@@ -301,42 +364,7 @@ export function RunView({ client, runId }: RunViewProps) {
             <div className="empty-stage-notice">⏳ 冒險隊伍準備中，尚未進入任何關卡...</div>
           ) : (
             stages.map((stage) => (
-              <div key={stage.stageId || stage.index} className={`stage-card ${stage.status}`}>
-                <div className="stage-card-header">
-                  <h4>
-                    第 {stage.index + 1} 關：{stage.name || stage.stageId}
-                  </h4>
-                  <span className={`stage-status-tag ${stage.status}`}>
-                    {stage.status === "running" && "⏳ 挑戰中 (Running)"}
-                    {stage.status === "completed" && "✅ 突破成功 (Completed)"}
-                    {stage.status === "failed" && "💀 挑戰失敗 (Failed)"}
-                    {stage.status === "pending" && "⏳ 等待中 (Pending)"}
-                  </span>
-                </div>
-                {stage.agentName && (
-                  <div className="stage-agent">
-                    🧙‍♂️ 負責夥伴 (Agent): <strong>{stage.agentName}</strong>
-                  </div>
-                )}
-                {stage.prompt && (
-                  <div className="stage-prompt">
-                    <strong>📜 任務指示 (Prompt):</strong>
-                    <pre>{stage.prompt}</pre>
-                  </div>
-                )}
-                {stage.output && (
-                  <div className="stage-output">
-                    <strong>💎 產出成果 (Output):</strong>
-                    <pre>{stage.output}</pre>
-                  </div>
-                )}
-                {stage.error && (
-                  <div className="stage-error">
-                    <strong>❌ 失敗原因 (Error):</strong>
-                    <pre>{stage.error}</pre>
-                  </div>
-                )}
-              </div>
+              <StageCard key={stage.stageId || stage.index} stage={stage} />
             ))
           )}
         </div>
@@ -344,20 +372,7 @@ export function RunView({ client, runId }: RunViewProps) {
 
       <section className="log-stream-section">
         <h3>📜 冒險日誌 (Live Log Stream)</h3>
-        <div className="log-stream">
-          {logs.length === 0 ? (
-            <div className="log-empty">⏳ 魔法捲軸準備就緒，等待事件記錄...</div>
-          ) : (
-            logs.map((log) => (
-              <div key={log.id} className={`log-entry ${log.type.replace(":", "-")}`}>
-                <span className="log-time">
-                  [{new Date(log.timestamp).toLocaleTimeString()}]
-                </span>{" "}
-                <span className="log-message">{log.message}</span>
-              </div>
-            ))
-          )}
-        </div>
+        <LogStream logs={logs} />
       </section>
     </div>
   );
