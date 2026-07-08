@@ -40,3 +40,12 @@ test("listByRun 回傳全部 checkpoint", () => {
   cps.create({ runId, stageId: "b", prompt: "2" });
   expect(cps.listByRun(runId)).toHaveLength(2);
 });
+
+test("getLatestByRun 取得最新 checkpoint", () => {
+  const { cps, runId } = setup();
+  expect(cps.getLatestByRun(runId)).toBeNull();
+  cps.create({ runId, stageId: "a", prompt: "1" });
+  const cp2 = cps.create({ runId, stageId: "b", prompt: "2" });
+  expect(cps.getLatestByRun(runId)?.id).toBe(cp2.id);
+});
+

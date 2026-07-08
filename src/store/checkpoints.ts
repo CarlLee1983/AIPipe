@@ -63,6 +63,13 @@ export class CheckpointRepository {
     return row ? toCheckpoint(row) : null;
   }
 
+  getLatestByRun(runId: string): CheckpointRecord | null {
+    const row = this.db
+      .query("SELECT * FROM checkpoints WHERE run_id = $runId ORDER BY rowid DESC LIMIT 1")
+      .get({ runId }) as CheckpointRow | null;
+    return row ? toCheckpoint(row) : null;
+  }
+
   listByRun(runId: string): CheckpointRecord[] {
     const rows = this.db
       .query("SELECT * FROM checkpoints WHERE run_id = $runId ORDER BY rowid ASC")
