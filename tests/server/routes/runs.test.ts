@@ -8,7 +8,7 @@ import { CheckpointRepository } from "../../../src/store/checkpoints";
 import { MockDriver } from "../../../src/driver/mock";
 import { EventBus } from "../../../src/server/events/bus";
 import { WorkflowCatalog } from "../../../src/server/workflows";
-import { createRunHandler, resumeRunHandler, getRunHandler } from "../../../src/server/routes/runs";
+import { createRunHandler, resumeRunHandler, getRunHandler, listRunsHandler } from "../../../src/server/routes/runs";
 import type { EngineDeps } from "../../../src/engine/runner";
 
 const tmpDir = join(import.meta.dir, ".tmp-routes");
@@ -77,7 +77,9 @@ test("GET getRunHandler 取得 run 詳細資料；找不到回 404", async () =>
   const getRes = await getRunHandler(new Request(`http://localhost/api/runs/${runId}`), deps, runId);
   expect(getRes.status).toBe(200);
   const runData = await getRes.json();
-  expect(runData.id).toBe(runId);
+  expect(runData.run.id).toBe(runId);
+  expect(Array.isArray(runData.steps)).toBe(true);
+  expect(Array.isArray(runData.checkpoints)).toBe(true);
 
   const notFound = await getRunHandler(new Request("http://localhost/api/runs/x"), deps, "x");
   expect(notFound.status).toBe(404);
@@ -102,4 +104,17 @@ test("POST resumeRunHandler 在 paused 狀態 approve 回 200；非 paused 回 4
   const resumeReq2 = jsonReq("POST", `http://localhost/api/runs/${runId}/resume`, { approve: true });
   const again = await resumeRunHandler(resumeReq2, deps, catalog, bus, runId);
   expect(again.status).toBe(409);
+});
+
+test("GET listRunsHandler 取得所有 runs 列表", async () => {
+  const { deps, catalog, bus } = setup();
+  expect(await (await listRunsHandler(new Request("http://localhost/api/runs"), deps)).json()).toEqual([]);
+
+  const req = jsonReq("POST", "http://localhost/api/runs", { workflow: "demo" });
+  await createRunHandler(req, deps, catalog, bus);
+  const listRes = await listRunsHandler(new Request("http://localhost/api/runs"), deps);
+  expect(listRes.status).toBe(200);
+  const runs = await listRes.json();
+  expect(runs.length).toBe(1);
+  expect(runs[0].workflowName).toBe("demo");
 });

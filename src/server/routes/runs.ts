@@ -112,11 +112,14 @@ export async function getRunHandler(
   }
 
   const steps = deps.steps.listByRun(runId);
-  const checkpoint = deps.checkpoints.getLatestByRun(runId);
 
   return json({
-    ...run,
-    stepCount: steps.length,
-    checkpoint: checkpoint ?? null,
+    run,
+    steps,
+    checkpoints: deps.checkpoints.listByRun(runId),
   });
+}
+
+export async function listRunsHandler(_req: Request, deps: EngineDeps): Promise<Response> {
+  return json(deps.runs.list());
 }
