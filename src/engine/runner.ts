@@ -6,12 +6,21 @@ import type { StepRepository } from "../store/steps";
 import type { CheckpointRepository } from "../store/checkpoints";
 import { loadWorkflowFromString } from "../schema/parse";
 
+export interface RunObserver {
+  onStageStart?(e: { stageId: string; name?: string; index: number; prompt: string }): void;
+  onStageDone?(e: { stageId: string; output: string }): void;
+  onCheckpoint?(e: { stageId: string; prompt: string; checkpointId: string }): void;
+  onRunDone?(e: { status: "completed" }): void;
+  onRunFailed?(e: { stageId: string; error: string }): void;
+}
+
 export interface EngineDeps {
   runs: RunRepository;
   steps: StepRepository;
   checkpoints: CheckpointRepository;
   driver: AgentDriver;
   logger?: (msg: string) => void;
+  observer?: RunObserver;
 }
 
 export async function executeFrom(
@@ -30,6 +39,7 @@ export async function executeFrom(
       deps.logger?.(`run ${run.id}：stage "${stage.id}" 未定義變數 {{${name}}}，以空字串代入`);
     }
 
+    deps.observer?.onStageStart?.({ stageId: stage.id, name: stage.name, index: i, prompt });
     const step = deps.steps.create({ runId: run.id, stageId: stage.id, prompt });
     const result = await deps.driver.run({
       prompt,
@@ -39,21 +49,25 @@ export async function executeFrom(
     });
 
     if (!result.success) {
-      deps.steps.fail(step.id, `driver 回報失敗：${JSON.stringify(result.raw)}`);
+      const error = `driver 回報失敗：${JSON.stringify(result.raw)}`;
+      deps.steps.fail(step.id, error);
       deps.runs.updateStatus(run.id, "failed");
+      deps.observer?.onRunFailed?.({ stageId: stage.id, error });
       return deps.runs.get(run.id)!;
     }
 
     deps.steps.complete(step.id, result.output);
+    deps.observer?.onStageDone?.({ stageId: stage.id, output: result.output });
     if (stage.output) {
       context = withOutput(context, stage.output, result.output);
       deps.runs.updateContext(run.id, context);
     }
 
     if (stage.checkpoint) {
-      deps.checkpoints.create({ runId: run.id, stageId: stage.id, prompt: stage.checkpoint.prompt });
+      const cp = deps.checkpoints.create({ runId: run.id, stageId: stage.id, prompt: stage.checkpoint.prompt });
       deps.runs.updateStageIndex(run.id, i + 1);
       deps.runs.updateStatus(run.id, "paused");
+      deps.observer?.onCheckpoint?.({ stageId: stage.id, prompt: stage.checkpoint.prompt, checkpointId: cp.id });
       return deps.runs.get(run.id)!;
     }
 
@@ -61,6 +75,7 @@ export async function executeFrom(
   }
 
   deps.runs.updateStatus(run.id, "completed");
+  deps.observer?.onRunDone?.({ status: "completed" });
   return deps.runs.get(run.id)!;
 }
 
