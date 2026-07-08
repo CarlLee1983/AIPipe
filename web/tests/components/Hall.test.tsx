@@ -26,5 +26,6 @@ test("Hall 載入後顯示任務佈告欄與 NPC 插槽", async () => {
   const view = render(<Hall />);
   const root = within(view.container);
   await waitFor(() => expect(root.getByText("任務佈告欄")).toBeDefined());
-  expect(root.getByText("NPC 公會主")).toBeDefined();
+  expect(root.getByAltText("NPC 公會主")).toBeDefined();
+  expect(root.getByAltText("玩家角色")).toBeDefined();
 });

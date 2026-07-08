@@ -1,9 +1,13 @@
 import { expect, test } from "bun:test";
 import { assetPath, hasAsset } from "../../src/assets/assets.config";
 
-test("未設定素材時回 null 並 hasAsset=false", () => {
-  expect(assetPath("scene-bg")).toBeNull();
-  expect(hasAsset("scene-bg")).toBe(false);
+test("主要場景素材已接入", () => {
+  expect(assetPath("scene-bg")).toBe("/assets/scene-bg.png");
+  expect(assetPath("npc-master")).toBe("/assets/npc-master.png");
+  expect(assetPath("player")).toBe("/assets/player.png");
+  expect(hasAsset("scene-bg")).toBe(true);
+  expect(hasAsset("npc-master")).toBe(true);
+  expect(hasAsset("player")).toBe(true);
 });
 
 test("所有 key 都可查詢不擲錯", () => {

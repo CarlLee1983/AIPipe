@@ -7,9 +7,9 @@ export type AssetKey =
   | "portrait-hero";
 
 const ASSETS: Record<AssetKey, string | null> = {
-  "scene-bg": null,
-  "npc-master": null,
-  player: null,
+  "scene-bg": "/assets/scene-bg.png",
+  "npc-master": "/assets/npc-master.png",
+  player: "/assets/player.png",
   adventurer: null,
   "portrait-master": null,
   "portrait-hero": null,

@@ -36,14 +36,14 @@ export function Hall() {
   const lastStep = detail?.steps[detail.steps.length - 1];
 
   return (
-    <div style={{ maxWidth: 760, margin: "0 auto", display: "grid", gap: 12, padding: 12 }}>
+    <div className="hall-shell">
       <HudBar title="勇者公會大廳" />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr minmax(220px, 260px)", gap: 12 }}>
+      <div className="hall-layout">
         <Scene>
-          <Sprite assetKey="npc-master" label="NPC 公會主" className="" />
-          <Sprite assetKey="player" label="玩家角色" className="" />
+          <Sprite assetKey="npc-master" label="NPC 公會主" className="sprite sprite-npc" />
+          <Sprite assetKey="player" label="玩家角色" className="sprite sprite-player" />
         </Scene>
-        <div style={{ display: "grid", gap: 12 }}>
+        <div className="hall-sidebar">
           <QuestMenu runs={runs} selectedId={selectedId} onSelect={setSelectedId} />
           <NewQuestForm workflows={workflows} onCreated={(id) => { setSelectedId(id); loadRuns(); }} />
         </div>

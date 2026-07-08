@@ -18,12 +18,14 @@
     inset 0 0 0 6px var(--ct-mid);
   padding: 12px 16px;
   font-family: ui-monospace, "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 .ct-window h4 {
-  margin: 0 0 6px;
-  font-size: 13px;
-  letter-spacing: 0.1em;
+  margin: 0 0 10px;
+  font-size: 16px;
+  letter-spacing: 0.04em;
   color: #eaf4ff;
 }
 
@@ -38,4 +40,57 @@
 
 .ct-who {
   color: #ffe27a;
+  font-weight: 700;
+}
+
+.quest-empty {
+  font-size: 13px;
+}
+
+.quest-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  font-size: 14px;
+  padding: 6px 2px;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.quest-status {
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.quest-field {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.quest-field label {
+  font-size: 13px;
+}
+
+.quest-control {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 34px;
+  font: inherit;
+  font-size: 14px;
+  padding: 5px 8px;
+}
+
+.quest-submit {
+  width: 100%;
+  min-height: 36px;
+  margin-top: 12px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
 }

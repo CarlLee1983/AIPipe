@@ -31,15 +31,16 @@ export function NewQuestForm({ workflows, onCreated }: {
   return (
     <div className="ct-window">
       <h4>發佈新任務</h4>
-      <select value={selected} onChange={(event) => { setSelected(event.target.value); setInputs({}); }}>
+      <select className="quest-control" value={selected} onChange={(event) => { setSelected(event.target.value); setInputs({}); }}>
         {workflows.map((item) => (
           <option key={item.name} value={item.name}>{item.name}</option>
         ))}
       </select>
       {workflow?.inputs.map((input) => (
-        <div key={input.name} style={{ marginTop: 6 }}>
-          <label htmlFor={input.name} style={{ fontSize: 11 }}>{input.name}{input.required ? " *" : ""}</label>
+        <div key={input.name} className="quest-field">
+          <label htmlFor={input.name}>{input.name}{input.required ? " *" : ""}</label>
           <input
+            className="quest-control"
             id={input.name}
             aria-label={input.name}
             value={inputs[input.name] ?? ""}
@@ -47,7 +48,7 @@ export function NewQuestForm({ workflows, onCreated }: {
           />
         </div>
       ))}
-      <button disabled={busy || !selected} onClick={submit} style={{ marginTop: 8 }}>發佈任務</button>
+      <button className="quest-submit" disabled={busy || !selected} onClick={submit}>發佈任務</button>
     </div>
   );
 }
