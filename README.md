@@ -132,4 +132,4 @@ cd web && bun run e2e        # Playwright E2E（自動起後端，用 MockDriver
 
 ## License
 
-尚未指定。
+本專案採用 [MIT License](LICENSE)。
